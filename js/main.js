@@ -1,4 +1,4 @@
-// PGT Studio — Main JS
+// APG Studio — Main JS
 
 // ─── Navbar scroll effect ───
 const navbar = document.getElementById('navbar');
@@ -13,7 +13,6 @@ menuToggle.addEventListener('click', () => {
   mobileMenu.classList.toggle('open');
   menuToggle.textContent = mobileMenu.classList.contains('open') ? '✕' : '☰';
 });
-// Close on link click
 mobileMenu.querySelectorAll('a').forEach(a => {
   a.addEventListener('click', () => {
     mobileMenu.classList.remove('open');
@@ -22,7 +21,9 @@ mobileMenu.querySelectorAll('a').forEach(a => {
 });
 
 // ─── Scroll fade-in ───
-const fadeEls = document.querySelectorAll('.service-card, .project-card, .stat-item, .about-text, .about-card, .contact-card');
+const fadeEls = document.querySelectorAll(
+  '.service-card, .project-card, .stat-item, .about-text, .about-card, .contact-card, .tl-item'
+);
 fadeEls.forEach(el => el.classList.add('fade-in'));
 
 const observer = new IntersectionObserver((entries) => {
@@ -32,7 +33,7 @@ const observer = new IntersectionObserver((entries) => {
       observer.unobserve(e.target);
     }
   });
-}, { threshold: 0.1 });
+}, { threshold: 0.08 });
 
 fadeEls.forEach(el => observer.observe(el));
 
@@ -49,10 +50,10 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
 });
 
 // ─── Auto-detect browser language ───
-(function() {
-  const lang = navigator.language.substring(0, 2);
-  const supported = ['es','en','pt','fr','de','it','ko','zh','ja','hi'];
+(function () {
+  const lang = (navigator.language || '').substring(0, 2);
+  const supported = ['es', 'en', 'pt', 'fr', 'de', 'it', 'ko', 'zh', 'ja', 'hi'];
   if (supported.includes(lang) && lang !== 'es') {
-    setLang(lang);
+    if (typeof setLang === 'function') setLang(lang);
   }
 })();
