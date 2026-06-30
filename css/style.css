@@ -332,6 +332,13 @@ body {
   margin-right: 4%;
 }
 
+.section-float-img.float-stack {
+  width: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
 .section-float-img img {
   display: block;
   width: 100%;
@@ -1573,4 +1580,16 @@ en style.css (desde ".projects-grid {" hasta ".projects-cta { ... }")===========
   }
 
   .closing-text {
+    padding: 60px 24px 40px;
+  }
+
+  .closing-photo {
+    justify-content: center;
+    padding-bottom: 0;
+  }
+
+  .closing-photo img {
+    max-height: 340px;
+  }
+}
  
