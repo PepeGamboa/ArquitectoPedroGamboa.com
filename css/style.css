@@ -978,9 +978,8 @@ h2 {
 /* ─── PROJECTS ─── */
 /* ================================================================
    FRAGMENTO CSS CORREGIDO
-   Reemplaza el bloque /* ─── PROJECTS ─── */ en style.css
-   (desde ".projects-grid {" hasta ".projects-cta { ... }")
-   ================================================================ */
+   Reemplaza el bloque /* ─── PROJECTS ─── */
+en style.css (desde ".projects-grid {" hasta ".projects-cta { ... }")================================================================*/
 
 /* ─── PROJECTS ─── */
 #projects {
@@ -1016,7 +1015,8 @@ h2 {
   height: 300px;
   overflow: hidden;
   position: relative;
-  background: var(--dark2); /* fallback si la imagen no carga */
+  background: var(--dark2);
+  /* fallback si la imagen no carga */
 }
 
 .project-img img {
@@ -1102,8 +1102,9 @@ h2 {
   menos espacio vacío en la parte superior donde aparece la imagen flotante,
   añade esto:
 */
-#experience > .section-float-img {
-  top: 4%;       /* era top:8%, lo reducimos para acercar la imagen al contenido */
+#experience>.section-float-img {
+  top: 4%;
+  /* era top:8%, lo reducimos para acercar la imagen al contenido */
 }
 
 /* También asegurar que la sección tenga overflow visible en desktop
