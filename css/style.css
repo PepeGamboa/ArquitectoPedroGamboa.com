@@ -166,6 +166,12 @@ body {
   background: var(--dark);
   padding: 24px 32px;
   border-top: 1px solid var(--gray);
+
+  .mobile-lang button:hover,
+  .mobile-lang button.active {
+    background: var(--gold);
+    color: var(--black);
+  }
 }
 
 .mobile-menu.open {
@@ -970,6 +976,13 @@ h2 {
 }
 
 /* ─── PROJECTS ─── */
+/* ================================================================
+   FRAGMENTO CSS CORREGIDO
+   Reemplaza el bloque /* ─── PROJECTS ─── */ en style.css
+   (desde ".projects-grid {" hasta ".projects-cta { ... }")
+   ================================================================ */
+
+/* ─── PROJECTS ─── */
 #projects {
   background: var(--dark);
 }
@@ -994,60 +1007,47 @@ h2 {
   grid-column: 1 / -1;
 }
 
+/*
+  CAMBIO PRINCIPAL: .project-img ahora es un contenedor
+  para imágenes reales (height fijo + overflow hidden + img object-fit)
+  Se eliminan los ::after con texto placeholder y los gradientes de fondo.
+*/
 .project-img {
   height: 300px;
-  background-size: cover;
-  background-position: center;
+  overflow: hidden;
   position: relative;
+  background: var(--dark2); /* fallback si la imagen no carga */
+}
+
+.project-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  transition: transform 0.6s ease;
+  filter: saturate(0.85) brightness(0.9);
+}
+
+.project-card:hover .project-img img {
+  transform: scale(1.04);
+  filter: saturate(1) brightness(0.95);
 }
 
 .project-card.featured .project-img {
   height: 420px;
 }
 
+/* Ya no se necesitan los gradientes ni los ::after con texto */
 .project-img-1 {
-  background: linear-gradient(135deg, #1a1510 0%, #2a2015 40%, #1a1208 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background-image: url('images/visita.jpg');
+  background-size: cover;
+  background-position: center;
 }
 
-.project-img-1::after {
-  content: 'MÉDERI · BIM LOD 500';
-  font-size: 0.65rem;
-  letter-spacing: 0.3em;
-  color: var(--gold);
-  opacity: 0.5;
-}
-
-.project-img-2 {
-  background: linear-gradient(135deg, #101520 0%, #15202a 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.project-img-2::after {
-  content: 'KENNEDY · 10.569 M²';
-  font-size: 0.65rem;
-  letter-spacing: 0.3em;
-  color: var(--gold);
-  opacity: 0.5;
-}
-
+.project-img-2,
 .project-img-3 {
-  background: linear-gradient(135deg, #151510 0%, #201e10 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.project-img-3::after {
-  content: 'U. SABANA · 34.120 M²';
-  font-size: 0.65rem;
-  letter-spacing: 0.3em;
-  color: var(--gold);
-  opacity: 0.5;
+  /* solo hereda .project-img, sin gradiente */
 }
 
 .project-info {
@@ -1074,11 +1074,44 @@ h2 {
 .project-info p {
   color: var(--mid);
   font-size: 0.83rem;
+  line-height: 1.65;
+}
+
+/* Nombre de la constructora resaltado en el pie */
+.project-info p strong {
+  color: var(--gold-light);
+  font-weight: 400;
 }
 
 .projects-cta {
   text-align: center;
   margin-top: 48px;
+}
+
+
+/* ================================================================
+   CORRECCIÓN ADICIONAL: section-float-img en #experience
+   El problema de "espacios tan grandes" (la X roja en la captura)
+   se debe a que la imagen flotante tiene position:absolute pero
+   la sección no tiene min-height suficiente. Ajustamos el padding
+   de #experience y reducimos el top de la imagen flotante.
+   ================================================================ */
+
+/*
+  OPCIONAL — si quieres que la sección experiencia tenga
+  menos espacio vacío en la parte superior donde aparece la imagen flotante,
+  añade esto:
+*/
+#experience > .section-float-img {
+  top: 4%;       /* era top:8%, lo reducimos para acercar la imagen al contenido */
+}
+
+/* También asegurar que la sección tenga overflow visible en desktop
+   para que la imagen flotante no quede cortada */
+@media (min-width: 1281px) {
+  #experience {
+    overflow: visible;
+  }
 }
 
 /* ─── CONTACT ─── */
@@ -1256,107 +1289,70 @@ h2 {
 }
 
 /* ─── RESPONSIVE ─── */
-@media (max-width: 1100px) {
-  .hero-layout {
-    grid-template-columns: 1fr;
-    gap: 48px;
-    padding-top: calc(var(--nav-h) + 20px);
+/* ─── RESPONSIVE MÓVIL MEJORADO ─── */
+
+/* Hero building glow — ocultar en móvil (ocupa espacio y no aporta) */
+@media (max-width: 768px) {
+  .hero-building-glow {
+    display: none;
   }
 
+  .hero-bim-bg {
+    display: none;
+  }
+
+  /* Hero layout: una columna, foto debajo del texto */
+  .hero-layout {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    padding-top: calc(var(--nav-h) + 16px);
+    padding-bottom: 48px;
+    min-height: auto;
+  }
+
+  /* Foto de perfil: centrada y con tamaño razonable */
   .hero-photo-wrap {
-    justify-content: flex-start;
+    justify-content: center;
   }
 
   .hero-photo-frame {
-    width: 300px;
+    width: 100%;
+    max-width: 300px;
   }
 
-  .hero-photo {
-    height: auto;
-    max-height: 400px;
+  /* Título hero más pequeño en móvil */
+  .hero-title {
+    font-size: clamp(2.2rem, 10vw, 3.5rem);
   }
 
-  #about .section-inner {
-    grid-template-columns: 1fr;
-    gap: 48px;
+  /* Botones CTA apilados */
+  .hero-cta {
+    flex-direction: column;
+    gap: 12px;
   }
 
-  .about-card {
-    position: static;
+  .btn-primary,
+  .btn-outline {
+    text-align: center;
+    width: 100%;
   }
 
+  /* Stats: 2 columnas en móvil pequeño */
   .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .services-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .contact-channels {
     grid-template-columns: 1fr 1fr;
-  }
-
-  .lang-selector {
-    display: none;
-  }
-
-  .menu-toggle {
-    display: block;
-  }
-
-  .nav-links {
     gap: 20px;
   }
 
-  .timeline {
-    margin-left: 80px;
-  }
-
-  .tl-date {
-    left: -100px;
-    width: 90px;
-  }
-}
-
-@media (max-width: 768px) {
-  :root {
-    --section-pad: 72px;
-  }
-
-  .nav-links {
-    display: none;
-  }
-
-  .services-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .projects-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .project-card.featured {
-    grid-column: auto;
-  }
-
-  .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .contact-channels {
-    grid-template-columns: 1fr;
-  }
-
+  /* Timeline: sin margen izquierdo, sin borde */
   .timeline {
     margin-left: 0;
     border-left: none;
+    padding-left: 0;
   }
 
   .tl-item {
-    grid-template-columns: 1fr;
     padding-left: 0;
-    padding-bottom: 36px;
+    padding-bottom: 32px;
     border-bottom: 1px solid var(--gray);
     margin-bottom: 24px;
   }
@@ -1370,38 +1366,87 @@ h2 {
     text-align: left;
     width: auto;
     margin-bottom: 8px;
+    display: block;
+  }
+
+  /* Grilla de servicios: 1 columna */
+  .services-grid {
+    grid-template-columns: 1fr;
+    gap: 1px;
+  }
+
+  /* Grilla de contacto: 1 columna */
+  .contact-channels {
+    grid-template-columns: 1fr;
+  }
+
+  /* Sección closing: una columna */
+  .closing-inner {
+    grid-template-columns: 1fr;
+  }
+
+  .closing-text {
+    padding: 60px 24px 32px;
+  }
+
+  .closing-photo {
+    padding-bottom: 0;
+    justify-content: center;
+  }
+
+  .closing-photo img {
+    max-height: 300px;
   }
 }
 
-@media (max-width: 480px) {
+/* ─── Pantallas muy pequeñas (< 400px) ─── */
+@media (max-width: 400px) {
+  :root {
+    --nav-h: 60px;
+    --section-pad: 56px;
+  }
+
   .nav-inner {
-    padding: 0 20px;
+    padding: 0 16px;
   }
 
   #hero {
-    padding: 0 20px;
+    padding: 0 16px;
   }
 
   .section-inner {
-    padding: var(--section-pad) 20px;
+    padding: var(--section-pad) 16px;
   }
 
   #stats {
-    padding: 48px 20px;
+    padding: 40px 16px;
   }
 
   .stats-grid {
     grid-template-columns: 1fr 1fr;
-    gap: 24px;
+    gap: 16px;
   }
 
-  .hero-photo {
-    height: auto;
-    max-height: 340px;
+  .stat-num {
+    font-size: 2.2rem;
   }
 
+  .hero-title {
+    font-size: 2rem;
+  }
+
+  /* Foto del hero ocupa todo el ancho */
   .hero-photo-frame {
     width: 100%;
+    max-width: 100%;
+  }
+
+  .photo-badge {
+    padding: 12px 14px;
+  }
+
+  .badge-name {
+    font-size: 0.95rem;
   }
 }
 
