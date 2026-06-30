@@ -313,7 +313,8 @@ body {
    drop-shadow "autoiluminación" sitting on top of the
    dotted/blueprint grid, alternating left/right. */
 .section-float-img {
-  position: absolute;
+  position: relative;
+  flex-shrink: 0;
   z-index: 1;
   pointer-events: none;
   width: 320px;
@@ -321,12 +322,14 @@ body {
   animation: floatPulse 6s ease-in-out infinite;
 }
 
-.section-float-img.side-right {
-  right: 0;
+.section-float-img.side-left {
+  order: 0;
+  margin-left: 4%;
 }
 
-.section-float-img.side-left {
-  left: 0;
+.section-float-img.side-right {
+  order: 2;
+  margin-right: 4%;
 }
 
 .section-float-img img {
@@ -409,6 +412,21 @@ body {
 #footer {
   position: relative;
   overflow: hidden;
+}
+
+/* Secciones con imagen flotante: layout en fila, imagen y texto
+   centrados verticalmente entre sí de forma natural (sin valores
+   arbitrarios de "top"). */
+#experience,
+#services,
+#contact {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.section-inner {
+  order: 1;
 }
 
 #stats::before,
@@ -1102,18 +1120,11 @@ en style.css (desde ".projects-grid {" hasta ".projects-cta { ... }")===========
   menos espacio vacío en la parte superior donde aparece la imagen flotante,
   añade esto:
 */
-#experience>.section-float-img {
-  top: 4%;
-  /* era top:8%, lo reducimos para acercar la imagen al contenido */
-}
+/* Ya no se necesita: el centrado vertical ahora es por defecto
+   en .section-float-img (top:50%; margin-top:-170px;). */
 
-/* También asegurar que la sección tenga overflow visible en desktop
-   para que la imagen flotante no quede cortada */
-@media (min-width: 1281px) {
-  #experience {
-    overflow: visible;
-  }
-}
+/* La sección mantiene overflow:hidden (regla general más arriba)
+   para que la imagen flotante quede contenida dentro de sus límites. */
 
 /* ─── CONTACT ─── */
 #contact {
@@ -1562,15 +1573,4 @@ en style.css (desde ".projects-grid {" hasta ".projects-cta { ... }")===========
   }
 
   .closing-text {
-    padding: 60px 24px 40px;
-  }
-
-  .closing-photo {
-    justify-content: center;
-    padding-bottom: 0;
-  }
-
-  .closing-photo img {
-    max-height: 340px;
-  }
-}
+ 
