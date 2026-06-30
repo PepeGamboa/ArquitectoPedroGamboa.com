@@ -114,7 +114,7 @@
     </div>
 
     <!-- Geometric building abstraction — autoiluminated glow -->
-    <svg class="hero-building-glow" viewBox="0 0 320 700" xmlns="http://www.w3.org/2000/svg" fill="none">
+    <svg class="hero-building-glow" viewBox="0 -100 320 800" xmlns="http://www.w3.org/2000/svg" fill="none">
       <!-- Grid base platform -->
       <line x1="20" y1="640" x2="300" y2="640" stroke="rgba(200,169,126,0.5)" stroke-width="1" />
       <line x1="20" y1="660" x2="300" y2="660" stroke="rgba(200,169,126,0.25)" stroke-width="0.5" />
@@ -180,16 +180,35 @@
       <line x1="185" y1="80" x2="185" y2="560" stroke="rgba(200,169,126,0.2)" stroke-width="0.5" />
       <line x1="210" y1="80" x2="210" y2="560" stroke="rgba(200,169,126,0.2)" stroke-width="0.5" />
 
-      <!-- Tower top accent -->
+      <!-- Tower top — asymmetric roof with a step/break on the right, per the red sketch -->
+      <!-- Narrow top accent box (kept from the original tower head) -->
       <rect x="130" y="50" width="60" height="30" stroke="rgba(200,169,126,0.7)" stroke-width="1.2"
         fill="rgba(200,169,126,0.04)" />
-      <line x1="160" y1="10" x2="160" y2="50" stroke="rgba(200,169,126,0.8)" stroke-width="1.5" />
-      <line x1="150" y1="30" x2="170" y2="30" stroke="rgba(200,169,126,0.5)" stroke-width="0.8" />
+
+      <!-- Left slope: short, drops almost straight to the tower's left edge -->
+      <line x1="165" y1="-55" x2="130" y2="50" stroke="rgba(200,169,126,0.7)" stroke-width="1.2" />
+      <line x1="130" y1="50" x2="85" y2="80" stroke="rgba(200,169,126,0.6)" stroke-width="1" />
+
+      <!-- Right slope: single long diagonal to the tower's right edge, crossed by floor ties -->
+      <line x1="165" y1="-55" x2="235" y2="80" stroke="rgba(200,169,126,0.7)" stroke-width="1.2" />
+      <line x1="186" y1="-15" x2="235" y2="-15" stroke="rgba(200,169,126,0.25)" stroke-width="0.5" />
+      <line x1="195" y1="2" x2="235" y2="2" stroke="rgba(200,169,126,0.25)" stroke-width="0.5" />
+      <line x1="204" y1="20" x2="235" y2="20" stroke="rgba(200,169,126,0.3)" stroke-width="0.6" />
+      <line x1="214" y1="40" x2="235" y2="40" stroke="rgba(200,169,126,0.3)" stroke-width="0.6" />
+      <line x1="225" y1="60" x2="235" y2="60" stroke="rgba(200,169,126,0.3)" stroke-width="0.6" />
+
+      <!-- Cross bracing inside the roof -->
+      <line x1="130" y1="50" x2="235" y2="80" stroke="rgba(200,169,126,0.25)" stroke-width="0.5" />
+      <line x1="165" y1="-55" x2="190" y2="50" stroke="rgba(200,169,126,0.25)" stroke-width="0.5" />
+
+      <!-- Mast continues above the apex -->
+      <line x1="165" y1="-55" x2="165" y2="-90" stroke="rgba(200,169,126,0.85)" stroke-width="1.4" />
+      <circle cx="165" cy="-90" r="2" fill="rgba(200,169,126,0.8)" />
 
       <!-- Glow core — vertical spine -->
-      <line x1="160" y1="10" x2="160" y2="700" stroke="rgba(200,169,126,0.12)" stroke-width="8" />
-      <line x1="160" y1="10" x2="160" y2="700" stroke="rgba(200,169,126,0.25)" stroke-width="3" />
-      <line x1="160" y1="10" x2="160" y2="700" stroke="rgba(200,169,126,0.6)" stroke-width="1" />
+      <line x1="165" y1="-90" x2="165" y2="700" stroke="rgba(200,169,126,0.12)" stroke-width="8" />
+      <line x1="165" y1="-90" x2="165" y2="700" stroke="rgba(200,169,126,0.25)" stroke-width="3" />
+      <line x1="165" y1="-90" x2="165" y2="700" stroke="rgba(200,169,126,0.6)" stroke-width="1" />
     </svg>
 
     <div class="scroll-hint">↓</div>
