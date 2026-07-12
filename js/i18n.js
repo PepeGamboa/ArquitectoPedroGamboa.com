@@ -3,6 +3,9 @@ const translations = {
 
   es: {
     nav_about: "Sobre mí",
+    nav_experience: "Experiencia",
+    exp_eyebrow: "Trayectoria",
+    exp_title: "Experiencia profesional",
     nav_services: "Servicios",
     nav_projects: "Proyectos",
     nav_contact: "Contacto",
@@ -60,6 +63,9 @@ const translations = {
 
   en: {
     nav_about: "About",
+    nav_experience: "Experience",
+    exp_eyebrow: "Career",
+    exp_title: "Professional experience",
     nav_services: "Services",
     nav_projects: "Projects",
     nav_contact: "Contact",
@@ -117,6 +123,9 @@ const translations = {
 
   pt: {
     nav_about: "Sobre mim",
+    nav_experience: "Experiência",
+    exp_eyebrow: "Trajetória",
+    exp_title: "Experiência profissional",
     nav_services: "Serviços",
     nav_projects: "Projetos",
     nav_contact: "Contato",
@@ -174,6 +183,9 @@ const translations = {
 
   fr: {
     nav_about: "À propos",
+    nav_experience: "Expérience",
+    exp_eyebrow: "Parcours",
+    exp_title: "Expérience professionnelle",
     nav_services: "Services",
     nav_projects: "Projets",
     nav_contact: "Contact",
@@ -231,6 +243,9 @@ const translations = {
 
   de: {
     nav_about: "Über mich",
+    nav_experience: "Erfahrung",
+    exp_eyebrow: "Werdegang",
+    exp_title: "Berufserfahrung",
     nav_services: "Leistungen",
     nav_projects: "Projekte",
     nav_contact: "Kontakt",
@@ -288,6 +303,9 @@ const translations = {
 
   it: {
     nav_about: "Chi sono",
+    nav_experience: "Esperienza",
+    exp_eyebrow: "Carriera",
+    exp_title: "Esperienza professionale",
     nav_services: "Servizi",
     nav_projects: "Progetti",
     nav_contact: "Contatto",
@@ -345,6 +363,9 @@ const translations = {
 
   ko: {
     nav_about: "소개",
+    nav_experience: "경력",
+    exp_eyebrow: "경력 사항",
+    exp_title: "전문 경력",
     nav_services: "서비스",
     nav_projects: "프로젝트",
     nav_contact: "연락처",
@@ -402,6 +423,9 @@ const translations = {
 
   zh: {
     nav_about: "关于我",
+    nav_experience: "经历",
+    exp_eyebrow: "职业历程",
+    exp_title: "专业经验",
     nav_services: "服务",
     nav_projects: "项目",
     nav_contact: "联系",
@@ -459,6 +483,9 @@ const translations = {
 
   ja: {
     nav_about: "プロフィール",
+    nav_experience: "経歴",
+    exp_eyebrow: "キャリア",
+    exp_title: "職務経歴",
     nav_services: "サービス",
     nav_projects: "プロジェクト",
     nav_contact: "お問い合わせ",
@@ -516,6 +543,9 @@ const translations = {
 
   hi: {
     nav_about: "परिचय",
+    nav_experience: "अनुभव",
+    exp_eyebrow: "करियर",
+    exp_title: "पेशेवर अनुभव",
     nav_services: "सेवाएं",
     nav_projects: "परियोजनाएं",
     nav_contact: "संपर्क",
