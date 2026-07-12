@@ -1660,3 +1660,289 @@ a.project-card {
     max-height: 340px;
   }
 }
+
+/* ─── RESPONSIVE ─── */
+/* ─── RESPONSIVE MÓVIL MEJORADO ─── */
+
+/* Hero building glow — ocultar en móvil (ocupa espacio y no aporta) */
+@media (max-width: 768px) {
+  .hero-building-glow {
+    display: none;
+  }
+
+  .hero-bim-bg {
+    display: none;
+  }
+
+  /* Hero layout: una columna, foto debajo del texto */
+  .hero-layout {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    padding-top: calc(var(--nav-h) + 16px);
+    padding-bottom: 48px;
+    min-height: auto;
+  }
+
+  /* Foto de perfil: centrada y con tamaño razonable */
+  .hero-photo-wrap {
+    justify-content: center;
+  }
+
+  .hero-photo-frame {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  /* Título hero más pequeño en móvil */
+  .hero-title {
+    font-size: clamp(2.2rem, 10vw, 3.5rem);
+  }
+
+  /* Botones CTA apilados */
+  .hero-cta {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .btn-primary,
+  .btn-outline {
+    text-align: center;
+    width: 100%;
+  }
+
+  /* Stats: 2 columnas en móvil pequeño */
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  /* Timeline: sin margen izquierdo, sin borde */
+  .timeline {
+    margin-left: 0;
+    border-left: none;
+    padding-left: 0;
+  }
+
+  .tl-item {
+    padding-left: 0;
+    padding-bottom: 32px;
+    border-bottom: 1px solid var(--gray);
+    margin-bottom: 24px;
+  }
+
+  .tl-item::before {
+    display: none;
+  }
+
+  .tl-date {
+    position: static;
+    text-align: left;
+    width: auto;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  /* Grilla de servicios: 1 columna */
+  .services-grid {
+    grid-template-columns: 1fr;
+    gap: 1px;
+  }
+
+  /* Grilla de contacto: 1 columna */
+  .contact-channels {
+    grid-template-columns: 1fr;
+  }
+
+  /* Sección closing: una columna */
+  .closing-inner {
+    grid-template-columns: 1fr;
+  }
+
+  .closing-text {
+    padding: 60px 24px 32px;
+  }
+
+  .closing-photo {
+    padding-bottom: 0;
+    justify-content: center;
+  }
+
+  .closing-photo img {
+    max-height: 300px;
+  }
+}
+
+/* ─── Pantallas muy pequeñas (< 400px) ─── */
+@media (max-width: 400px) {
+  :root {
+    --nav-h: 60px;
+    --section-pad: 56px;
+  }
+
+  .nav-inner {
+    padding: 0 16px;
+  }
+
+  #hero {
+    padding: 0 16px;
+  }
+
+  .section-inner {
+    padding: var(--section-pad) 16px;
+  }
+
+  #stats {
+    padding: 40px 16px;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .stat-num {
+    font-size: 2.2rem;
+  }
+
+  .hero-title {
+    font-size: 2rem;
+  }
+
+  /* Foto del hero ocupa todo el ancho */
+  .hero-photo-frame {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .photo-badge {
+    padding: 12px 14px;
+  }
+
+  .badge-name {
+    font-size: 0.95rem;
+  }
+}
+
+/* ─── Closing Section ─── */
+#closing {
+  background: #0d0d0d;
+  padding: 0;
+  overflow: hidden;
+}
+
+.closing-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: end;
+  min-height: 560px;
+}
+
+.closing-text {
+  padding: 80px 60px 80px 40px;
+}
+
+.closing-tag {
+  font-family: var(--font-serif);
+  letter-spacing: .18em;
+  font-size: .72rem;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 1.2rem;
+}
+
+.closing-heading {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 300;
+  color: #fff;
+  line-height: 1.2;
+  margin-bottom: 1.4rem;
+}
+
+.closing-heading em {
+  font-style: italic;
+  color: var(--gold);
+}
+
+.closing-sub {
+  font-size: .96rem;
+  color: rgba(255, 255, 255, .65);
+  line-height: 1.75;
+  max-width: 420px;
+  margin-bottom: 2rem;
+}
+
+.closing-cta {
+  display: inline-block;
+  background: var(--gold);
+  color: #111;
+  padding: .85rem 2.2rem;
+  font-size: .82rem;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: background .25s, transform .2s;
+}
+
+.closing-cta:hover {
+  background: #c9a84c;
+  transform: translateY(-2px);
+}
+
+.closing-photo {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  height: 100%;
+}
+
+.closing-photo img {
+  max-height: 520px;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(-12px 0 40px rgba(196, 160, 74, .18));
+  display: block;
+}
+
+/* ─── Hero photo fix (external file, no dark bg) ─── */
+.hero-photo-card {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.hero-photo-card img {
+  width: 100%;
+  max-height: 480px;
+  object-fit: contain;
+}
+
+/* ─── Logo UNAL in about-card ─── */
+.logo-img {
+  border-radius: 50%;
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+}
+
+@media (max-width: 768px) {
+  .closing-inner {
+    grid-template-columns: 1fr;
+  }
+
+  .closing-text {
+    padding: 60px 24px 40px;
+  }
+
+  .closing-photo {
+    justify-content: center;
+    padding-bottom: 0;
+  }
+
+  .closing-photo img {
+    max-height: 340px;
+  }
+}
