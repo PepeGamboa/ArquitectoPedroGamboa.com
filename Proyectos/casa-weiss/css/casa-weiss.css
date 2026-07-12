@@ -344,6 +344,66 @@ code {
   color: var(--wh-text-faint);
 }
 
+/* Panel de capas */
+.wh-layers-panel {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.9rem 1.25rem 1.1rem;
+  border-top: 1px solid var(--wh-line-soft);
+  background: var(--wh-bg-raised);
+}
+
+.wh-layers-label {
+  font-family: var(--wh-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--wh-text-faint);
+  margin-right: 0.25rem;
+}
+
+.wh-layer-btn {
+  font-family: var(--wh-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.01em;
+  color: var(--wh-text);
+  background: transparent;
+  border: 1px solid var(--wh-accent);
+  border-radius: var(--wh-radius);
+  padding: 0.4rem 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.wh-layer-btn.is-active {
+  color: var(--wh-bg);
+  background: var(--wh-accent);
+}
+
+.wh-layer-btn:not(.is-active) {
+  color: var(--wh-text-faint);
+  border-color: var(--wh-line);
+  text-decoration: line-through;
+  text-decoration-color: var(--wh-text-faint);
+}
+
+.wh-layer-btn:hover {
+  border-color: var(--wh-text-dim);
+}
+
+.wh-layer-btn.is-unavailable {
+  opacity: 0.35;
+  cursor: not-allowed;
+  text-decoration: none;
+}
+
+.wh-layer-btn.is-unavailable:hover {
+  border-color: var(--wh-line);
+}
+
 /* ───────────────────── Info / Acordeón ───────────────────── */
 
 .wh-info {
@@ -511,5 +571,15 @@ code {
   .wh-vc-hint {
     margin-left: 0;
     width: 100%;
+  }
+
+  .wh-layers-panel {
+    gap: 0.4rem;
+    padding: 0.8rem 1rem 1rem;
+  }
+
+  .wh-layer-btn {
+    font-size: 0.66rem;
+    padding: 0.35rem 0.6rem;
   }
 }

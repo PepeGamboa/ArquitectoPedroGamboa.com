@@ -20,6 +20,72 @@ const autorotateBtn = document.getElementById('whToggleAutorotate');
 const autorotateLabel = document.getElementById('whAutorotateLabel');
 const wireBtn = document.getElementById('whToggleWire');
 const wireLabel = document.getElementById('whWireLabel');
+const layerButtons = document.querySelectorAll('.wh-layer-btn[data-layer]');
+
+// ─── Definición de capas del modelo ───
+// Empareja cada botón con los nombres de grupo/instancia tal como fueron
+// exportados desde SketchUp (Instancia en el panel "Información de la
+// entidad"). Se compara sin tildes y en mayúsculas, así que es tolerante a
+// variaciones menores de mayúsculas/minúsculas.
+// Nota: "estructura cubierta" y "puertas y ventanas" ya no son capas propias:
+// esa geometría se agrupó dentro de CUBIERTA y MUROS respectivamente en el modelo.
+const LAYER_DEFINITIONS = [
+  { key: 'cubierta', names: ['CUBIERTA', 'ROOF'] },
+  { key: 'muros', names: ['MUROS', 'WALLS'] },
+  { key: 'arboles', names: ['ARBOLES', 'ÁRBOLES', 'TREES'] },
+  { key: 'pisos', names: ['PISOS', 'FLOORS'] },
+  { key: 'lote', names: ['LOTE', 'SITE', 'LOT', 'TERRENO'] },
+];
+
+function normalizeName(str) {
+  return (str || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '') // quita tildes
+    .toUpperCase()
+    .trim();
+}
+
+const layerObjects = {}; // key -> [Object3D, ...]
+
+function collectLayerObjects(root) {
+  LAYER_DEFINITIONS.forEach((def) => (layerObjects[def.key] = []));
+
+  root.traverse((obj) => {
+    const normalized = normalizeName(obj.name);
+    if (!normalized) return;
+    const def = LAYER_DEFINITIONS.find((d) =>
+      d.names.some((n) => normalizeName(n) === normalized)
+    );
+    if (def) layerObjects[def.key].push(obj);
+  });
+
+  // Marca como no disponibles los botones cuyo grupo no existe en el modelo
+  layerButtons.forEach((btn) => {
+    const key = btn.dataset.layer;
+    const found = (layerObjects[key] || []).length > 0;
+    btn.classList.toggle('is-unavailable', !found);
+    btn.disabled = !found;
+    if (!found) {
+      btn.title = 'No se encontró este grupo en el modelo 3D';
+    }
+  });
+}
+
+function setLayerVisible(key, visible) {
+  (layerObjects[key] || []).forEach((obj) => {
+    obj.visible = visible;
+  });
+}
+
+layerButtons.forEach((btn) => {
+  btn.addEventListener('click', () => {
+    if (btn.disabled) return;
+    const key = btn.dataset.layer;
+    const nowActive = !btn.classList.contains('is-active');
+    btn.classList.toggle('is-active', nowActive);
+    setLayerVisible(key, nowActive);
+  });
+});
 
 // ─── Scene setup ───
 const scene = new THREE.Scene();
@@ -208,14 +274,44 @@ loader.load(
     scene.add(modelRoot);
 
     const maxDim = Math.max(size.x, size.y, size.z) || 10;
-    const fitDistance = maxDim * 1.6;
 
+    // ─── Vista inicial: centrada y acercada a la chimenea ───
+    // Busca primero un grupo/objeto cuyo nombre incluya "chimenea"/"chimney"
+    // (por si en el futuro se etiqueta explícitamente en SketchUp). Si no
+    // existe, usa una posición estimada dentro del volumen del modelo ya
+    // recentrado: la chimenea de piedra está desplazada hacia un costado
+    // y sobresale por encima de la línea de cubierta.
+    let chimneyCenter = null;
+    modelRoot.traverse((obj) => {
+      const n = normalizeName(obj.name);
+      if (n.includes('CHIMENEA') || n.includes('CHIMNEY')) {
+        const b = new THREE.Box3().setFromObject(obj);
+        if (!b.isEmpty()) {
+          chimneyCenter = chimneyCenter
+            ? chimneyCenter.add(b.getCenter(new THREE.Vector3())).multiplyScalar(0.5)
+            : b.getCenter(new THREE.Vector3());
+        }
+      }
+    });
+
+    if (!chimneyCenter) {
+      // Estimación: costado izquierdo del volumen, cerca de la parte alta
+      // de cubierta. Ajusta estos tres multiplicadores si la chimenea no
+      // queda perfectamente centrada — son fracciones del tamaño del modelo.
+      chimneyCenter = new THREE.Vector3(
+        -size.x * 0.10,
+        size.y * 0.68,
+        size.z * 0.03
+      );
+    }
+
+    const chimneyDist = Math.max(maxDim * 0.55, 6);
     initialCameraPos = new THREE.Vector3(
-      fitDistance * 0.75,
-      fitDistance * 0.55,
-      fitDistance * 0.75
+      chimneyCenter.x + chimneyDist * 0.85,
+      chimneyCenter.y + chimneyDist * 0.45,
+      chimneyCenter.z + chimneyDist * 0.85
     );
-    initialTarget = new THREE.Vector3(0, size.y * 0.15, 0);
+    initialTarget = chimneyCenter.clone();
 
     camera.position.copy(initialCameraPos);
     camera.near = maxDim / 100;
@@ -233,6 +329,9 @@ loader.load(
     // Luces interiores, calculadas ya con el modelo recentrado en el origen
     const recenteredBox = new THREE.Box3().setFromObject(modelRoot);
     addInteriorLights(recenteredBox, size, new THREE.Vector3(0, 0, 0));
+
+    // Empareja los botones de capas con los grupos reales del modelo
+    collectLayerObjects(modelRoot);
 
     hideLoader();
     fallbackEl.hidden = true;
