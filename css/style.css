@@ -205,6 +205,24 @@ body {
   border-radius: var(--radius);
 }
 
+/* ─── NAV RESPONSIVE ───
+   Nunca existía una regla que colapsara el menú a hamburguesa en móvil:
+   .nav-links y .lang-selector se quedaban con su ancho de escritorio,
+   empujando el nav-inner más allá del viewport y generando scroll
+   horizontal en toda la página (por eso los botones del hero y las
+   fotos se veían desalineados/cortados en las capturas de móvil). */
+@media (max-width: 900px) {
+
+  .nav-links,
+  .lang-selector {
+    display: none;
+  }
+
+  .menu-toggle {
+    display: block;
+  }
+}
+
 /* ─── HERO ─── */
 #hero {
   position: relative;
