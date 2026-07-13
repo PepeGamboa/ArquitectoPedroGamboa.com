@@ -9,6 +9,21 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 const MODEL_URL = 'weiss-optimized.glb';
 const LOTE_URL = 'lote.glb';
 
+// ─── Detección de móvil / GPU limitada ───
+// Los GPUs de móvil (sobre todo Android gama media) tienen un límite bajo
+// de "uniforms" de fragment shader. La escena original usa 12 luces a la
+// vez (7 direccionales/ambientales + 5 puntuales) más un mapa de sombras
+// de 2048px. En varios móviles eso hace que el shader del material de la
+// casa falle al compilar — three.js no lanza error visible, simplemente
+// esa malla se renderiza negra/invisible, mezclándose con el fondo oscuro.
+// Por eso en móvil se ve solo la foto del lote (material simple, sin luces)
+// y la casa "desaparece". Esta bandera reduce luces/sombras/resolución en
+// dispositivos táctiles o pantallas angostas para evitar ese fallo.
+const isMobile =
+  /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+  (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) ||
+  window.innerWidth < 768;
+
 // ─── DOM refs ───
 const host = document.getElementById('whCanvasHost');
 const canvas = document.getElementById('whCanvas');
@@ -115,21 +130,33 @@ const renderer = new THREE.WebGLRenderer({
   antialias: true,
   alpha: false,
 });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.5 : 2));
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 2.2; // subido: iluminación general más alta
-renderer.shadowMap.enabled = true;
+renderer.shadowMap.enabled = !isMobile; // sombras apagadas en móvil (ver nota de isMobile arriba)
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+// Si el contexto WebGL se pierde (frecuente en móviles con poca memoria de
+// GPU cuando hay varias pestañas abiertas), mostramos el fallback en vez de
+// dejar un canvas congelado o en negro sin explicación.
+canvas.addEventListener('webglcontextlost', (e) => {
+  e.preventDefault();
+  console.error('Contexto WebGL perdido');
+  showFallback(new Error('Se perdió el contexto WebGL (posible falta de memoria de GPU en este dispositivo).'));
+});
 
 function sizeRenderer() {
   const w = host.clientWidth;
   const h = host.clientHeight;
+  if (!w || !h) return; // evita aspect = Infinity/NaN si el layout aún no está listo (frecuente en móvil)
   renderer.setSize(w, h, false);
   camera.aspect = w / h;
   camera.updateProjectionMatrix();
 }
 sizeRenderer();
+// Reintento por si el primer cálculo cayó en un momento con host.clientHeight = 0
+requestAnimationFrame(sizeRenderer);
 
 // ─── Posición solar real ───
 // 2935 Whitehall Road, East Norriton, PA (40.13°N, 75.36°O)
@@ -150,25 +177,33 @@ function sunDirectionFromAngles(elevationDeg, azimuthDeg, northOffsetDeg = 0) {
 }
 
 // ─── Lights (sol real de la mañana + relleno general fuerte) ───
-const ambient = new THREE.AmbientLight(0xe4ecf8, 1.1); // subido de 0.85 → 1.1
+// En móvil se usan menos luces y sin sombra dinámica: sumar demasiadas
+// luces (antes: 7 direccionales/ambientales + 5 puntuales = 12) puede
+// superar el límite de uniforms del fragment shader en GPUs de gama media,
+// lo que hace que el material de la casa falle al compilar y se dibuje
+// negro/invisible en vez de mostrar un error. Con menos luces el resultado
+// se ve un poco más plano que en escritorio, pero la casa se ve.
+const ambient = new THREE.AmbientLight(0xe4ecf8, isMobile ? 1.6 : 1.1);
 scene.add(ambient);
 
-const hemi = new THREE.HemisphereLight(0xb8d4f0, 0x8a7d64, 1.9); // subido de 1.5 → 1.9, rebote de tierra más claro
+const hemi = new THREE.HemisphereLight(0xb8d4f0, 0x8a7d64, isMobile ? 2.2 : 1.9);
 scene.add(hemi);
 
 // Sol principal (cálido, mañana de verano)
 const key = new THREE.DirectionalLight(0xffdca8, 3.4); // subido de 3.0 → 3.4
 const sunPos = sunDirectionFromAngles(SUN_ELEVATION_DEG, SUN_AZIMUTH_DEG, NORTH_OFFSET_DEG);
 key.position.copy(sunPos);
-key.castShadow = true;
-key.shadow.mapSize.set(2048, 2048);
-key.shadow.camera.near = 1;
-key.shadow.camera.far = 120;
-key.shadow.camera.left = -30;
-key.shadow.camera.right = 30;
-key.shadow.camera.top = 30;
-key.shadow.camera.bottom = -30;
-key.shadow.bias = -0.0005;
+key.castShadow = !isMobile;
+if (!isMobile) {
+  key.shadow.mapSize.set(2048, 2048);
+  key.shadow.camera.near = 1;
+  key.shadow.camera.far = 120;
+  key.shadow.camera.left = -30;
+  key.shadow.camera.right = 30;
+  key.shadow.camera.top = 30;
+  key.shadow.camera.bottom = -30;
+  key.shadow.bias = -0.0005;
+}
 scene.add(key);
 
 // Relleno frío desde el lado opuesto al sol
@@ -181,15 +216,17 @@ const frontFill = new THREE.DirectionalLight(0xffffff, 1.6); // subido de 1.1 �
 frontFill.position.set(0, 12, 25);
 scene.add(frontFill);
 
-// Luz de relleno lateral opuesta
-const sideFill = new THREE.DirectionalLight(0xffffff, 1.2); // subido de 0.8 → 1.2
-sideFill.position.set(-25, 10, 0);
-scene.add(sideFill);
+// Luces de relleno adicionales (lateral + cenital) — solo en escritorio,
+// para no acumular más luces de las que un GPU de móvil pueda compilar.
+if (!isMobile) {
+  const sideFill = new THREE.DirectionalLight(0xffffff, 1.2);
+  sideFill.position.set(-25, 10, 0);
+  scene.add(sideFill);
 
-// Relleno cenital adicional — ataca techo y aristas superiores
-const topFill = new THREE.DirectionalLight(0xffffff, 0.9); // nueva
-topFill.position.set(5, 30, 5);
-scene.add(topFill);
+  const topFill = new THREE.DirectionalLight(0xffffff, 0.9);
+  topFill.position.set(5, 30, 5);
+  scene.add(topFill);
+}
 
 // Ground plane to catch shadows
 const ground = new THREE.Mesh(
@@ -240,7 +277,7 @@ function tweenCameraTo(pos, target, duration = 900) {
 const interiorLights = [];
 
 function addInteriorLights(box, size, center) {
-  const count = 5; // número de "focos" interiores
+  const count = isMobile ? 2 : 5; // menos "focos" interiores en móvil (ver nota de isMobile arriba)
   const warmColor = 0xffb877;
   const intensity = 1.4;
   const distance = Math.max(size.x, size.z) * 0.8;
@@ -508,7 +545,11 @@ loader.load(
     // Encuadre tipo "presentación": diagonal, elevado, mostrando toda la
     // casa (cubierta, muros, chimenea) de cerca pero sin recortarla.
     // VIEW_DIST_FACTOR: <1 acerca la vista, >1 la aleja.
-    const VIEW_DIST_FACTOR = 0.95;
+    // En móvil el visor usa una proporción más vertical (ver casa-weiss.css),
+    // lo que estrecha el campo de visión horizontal (el FOV vertical de la
+    // cámara es fijo). Se aleja un poco la cámara ahí para que la casa
+    // completa siga cabiendo en el encuadre sin recortarse por los lados.
+    const VIEW_DIST_FACTOR = isMobile ? 1.25 : 0.95;
     const viewDist = maxDim * VIEW_DIST_FACTOR;
     initialCameraPos = new THREE.Vector3(
       viewDist * 0.95,

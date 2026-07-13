@@ -12,7 +12,8 @@
   --wh-text: #ece8e0;
   --wh-text-dim: #a8a49a;
   --wh-text-faint: #6f6c63;
-  --wh-accent: #b8905c;      /* piedra / stone gold */
+  --wh-accent: #b8905c;
+  /* piedra / stone gold */
   --wh-accent-soft: rgba(184, 144, 92, 0.15);
   --wh-serif: 'Cormorant Garamond', Georgia, serif;
   --wh-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -581,5 +582,44 @@ code {
   .wh-layer-btn {
     font-size: 0.66rem;
     padding: 0.35rem 0.6rem;
+  }
+
+  /* ─── Visor 3D: más alto y de borde a borde en móvil ───
+     16/9 sobre un ancho de ~360-400px deja el visor muy bajito (~200px),
+     dejando poco espacio para apreciar el modelo. En pantallas angostas
+     se usa una proporción más cuadrada y se quita el margen lateral para
+     aprovechar todo el ancho disponible. */
+  .wh-viewer-section {
+    padding: 0.5rem 0 3rem;
+  }
+
+  .wh-viewer-frame {
+    border-left: none;
+    border-right: none;
+    border-radius: 0;
+  }
+
+  .wh-canvas-host {
+    aspect-ratio: 4 / 5;
+  }
+
+  .wh-viewer-controls {
+    padding: 0.85rem 1rem;
+    gap: 0.5rem;
+  }
+
+  .wh-vc-btn {
+    flex: 1 1 auto;
+    text-align: center;
+    padding: 0.6rem 0.5rem;
+  }
+
+  /* Hero: menos aire arriba/abajo y CTAs más compactos */
+  .wh-hero {
+    padding: clamp(2.5rem, 10vw, 4rem) 1.25rem 2rem;
+  }
+
+  .wh-hero-ctas {
+    gap: 1rem;
   }
 }
