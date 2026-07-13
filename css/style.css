@@ -409,7 +409,19 @@ body {
 }
 
 @media (max-width: 1280px) {
-  .section-float-img {
+
+  /* Antes esta regla solo apuntaba a ".section-float-img" (1 clase), pero
+     el HTML usa ".section-float-img.float-stack" / ".side-left" / ".side-right"
+     (2 clases), que en CSS pesan MÁS que una sola clase — así que esa regla
+     de "ocultar" nunca ganaba, sin importar que estuviera después en el
+     archivo. Por eso las miniaturas seguían apareciendo sueltas en móvil.
+     Se repiten aquí las mismas combinaciones de clases para igualar (o
+     superar) esa especificidad y que el ocultamiento sí se aplique. */
+  .section-float-img,
+  .section-float-img.side-left,
+  .section-float-img.side-right,
+  .section-float-img.float-stack {
+    display: none;
     width: 0;
     flex-basis: 0;
     margin-left: 0;
@@ -1466,6 +1478,21 @@ a.project-card {
     grid-template-columns: 1fr;
   }
 
+  /* Sección "Sobre mí": la tarjeta de contacto (about-card) usaba una
+     grilla de 2 columnas fija (1fr 360px) que nunca se colapsaba en móvil,
+     por lo que la tarjeta terminaba superpuesta sobre el texto. Se pasa a
+     1 columna y se quita el "sticky" (que en una sola columna no aporta y
+     puede quedar pegado tapando contenido al hacer scroll). */
+  #about .section-inner {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .about-card {
+    position: static;
+    top: auto;
+  }
+
   /* Sección closing: una columna */
   .closing-inner {
     grid-template-columns: 1fr;
@@ -1750,6 +1777,21 @@ a.project-card {
   /* Grilla de contacto: 1 columna */
   .contact-channels {
     grid-template-columns: 1fr;
+  }
+
+  /* Sección "Sobre mí": la tarjeta de contacto (about-card) usaba una
+     grilla de 2 columnas fija (1fr 360px) que nunca se colapsaba en móvil,
+     por lo que la tarjeta terminaba superpuesta sobre el texto. Se pasa a
+     1 columna y se quita el "sticky" (que en una sola columna no aporta y
+     puede quedar pegado tapando contenido al hacer scroll). */
+  #about .section-inner {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .about-card {
+    position: static;
+    top: auto;
   }
 
   /* Sección closing: una columna */
