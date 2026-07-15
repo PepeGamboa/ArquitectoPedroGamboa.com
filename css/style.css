@@ -308,7 +308,11 @@ body {
   width: 320px;
   height: 80vh;
   pointer-events: none;
-  z-index: 3;
+  /* Antes tenía z-index:3, igual que .hero-layout (que contiene la foto),
+     y al aparecer después en el HTML pintaba ENCIMA de la foto en
+     desktop (las líneas de la torre cruzaban la cara/casco). Bajamos a 2,
+     el mismo nivel que .hero-bim-bg, para que quede detrás de la foto. */
+  z-index: 2;
   animation: buildingPulse 5s ease-in-out infinite;
 }
 
