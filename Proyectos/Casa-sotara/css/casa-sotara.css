@@ -1,0 +1,625 @@
+/* ============================================================
+   Casa Sótara (Casa en Río Frío) — Rogelio Salmona · APG Studio
+   Estudio de caso — hoja de estilos
+   ============================================================ */
+
+:root {
+  --cs-bg: #0d0d0c;
+  --cs-bg-raised: #151512;
+  --cs-bg-panel: #18180f;
+  --cs-line: rgba(255, 255, 255, 0.10);
+  --cs-line-soft: rgba(255, 255, 255, 0.06);
+  --cs-text: #ece8e0;
+  --cs-text-dim: #a8a49a;
+  --cs-text-faint: #6f6c63;
+  --cs-accent: #b5502f;
+  /* ladrillo salmona / terracota */
+  --cs-accent-soft: rgba(181, 80, 47, 0.15);
+  --cs-serif: 'Cormorant Garamond', Georgia, serif;
+  --cs-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --cs-mono: 'JetBrains Mono', 'SFMono-Regular', monospace;
+  --cs-radius: 2px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--cs-bg);
+  color: var(--cs-text);
+  font-family: var(--cs-sans);
+  font-weight: 300;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+code {
+  font-family: var(--cs-mono);
+  font-size: 0.85em;
+  background: var(--cs-bg-panel);
+  padding: 0.1em 0.4em;
+  border-radius: var(--cs-radius);
+  color: var(--cs-accent);
+}
+
+/* ───────────────────── Topbar ───────────────────── */
+
+.cs-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.1rem clamp(1.25rem, 5vw, 3rem);
+  background: rgba(13, 13, 12, 0.85);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--cs-line-soft);
+}
+
+.cs-back {
+  font-family: var(--cs-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.03em;
+  color: var(--cs-text-dim);
+  transition: color 0.2s ease;
+}
+
+.cs-back:hover {
+  color: var(--cs-accent);
+}
+
+.cs-topbar-label {
+  font-family: var(--cs-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--cs-text-faint);
+}
+
+/* ───────────────────── Hero ───────────────────── */
+
+.cs-hero {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: clamp(4rem, 10vw, 7rem) clamp(1.25rem, 5vw, 3rem) 3rem;
+  text-align: center;
+}
+
+.cs-eyebrow {
+  font-family: var(--cs-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--cs-accent);
+  margin: 0 0 1.25rem;
+}
+
+.cs-title {
+  font-family: var(--cs-serif);
+  font-weight: 400;
+  font-size: clamp(2.75rem, 8vw, 5rem);
+  line-height: 1.05;
+  margin: 0 0 0.6rem;
+  letter-spacing: 0.01em;
+}
+
+.cs-architect {
+  font-family: var(--cs-serif);
+  font-style: italic;
+  font-size: 1.15rem;
+  color: var(--cs-text-dim);
+  margin: 0 0 1.75rem;
+}
+
+.cs-hero-note {
+  font-size: 0.98rem;
+  font-weight: 300;
+  color: var(--cs-text-dim);
+  max-width: 560px;
+  margin: 0 auto 2.5rem;
+}
+
+.cs-hero-ctas {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.75rem;
+  flex-wrap: wrap;
+}
+
+.cs-scroll-cue {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--cs-mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.03em;
+  padding: 0.85rem 1.6rem;
+  border: 1px solid var(--cs-accent);
+  border-radius: var(--cs-radius);
+  color: var(--cs-bg);
+  background: var(--cs-accent);
+  transition: all 0.25s ease;
+}
+
+.cs-scroll-cue:hover {
+  background: transparent;
+  color: var(--cs-accent);
+}
+
+.cs-scroll-cue svg {
+  transition: transform 0.25s ease;
+}
+
+.cs-scroll-cue:hover svg {
+  transform: translateY(2px);
+}
+
+.cs-scroll-cue--ghost {
+  background: transparent;
+  color: var(--cs-text-dim);
+  border-color: var(--cs-line);
+}
+
+.cs-scroll-cue--ghost:hover {
+  color: var(--cs-text);
+  border-color: var(--cs-text-dim);
+}
+
+/* ───────────────────── Visor 3D ───────────────────── */
+
+.cs-viewer-section {
+  padding: 1rem clamp(1.25rem, 5vw, 3rem) 4rem;
+}
+
+.cs-viewer-frame {
+  max-width: 1200px;
+  margin: 0 auto;
+  border: 1px solid var(--cs-line);
+  border-radius: var(--cs-radius);
+  overflow: hidden;
+  background: var(--cs-bg-raised);
+}
+
+.cs-canvas-host {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #111110;
+}
+
+#csCanvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Loader */
+.cs-loader {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  background: #111110;
+}
+
+.cs-loader-ring {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 2px solid var(--cs-line);
+  border-top-color: var(--cs-accent);
+  animation: cs-spin 0.9s linear infinite;
+}
+
+@keyframes cs-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.cs-loader-text {
+  font-family: var(--cs-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.03em;
+  color: var(--cs-text-dim);
+  margin: 0;
+}
+
+/* Fallback */
+.cs-fallback {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 2rem;
+  text-align: center;
+  background: #111110;
+}
+
+.cs-fallback[hidden] {
+  display: none !important;
+}
+
+.cs-loader[hidden] {
+  display: none !important;
+}
+
+.cs-fallback-svg {
+  width: 72px;
+  height: 60px;
+  color: var(--cs-text-faint);
+  margin-bottom: 0.5rem;
+}
+
+.cs-fallback-title {
+  font-family: var(--cs-serif);
+  font-size: 1.3rem;
+  margin: 0;
+  color: var(--cs-text);
+}
+
+.cs-fallback-text {
+  font-size: 0.88rem;
+  color: var(--cs-text-dim);
+  max-width: 420px;
+  margin: 0;
+}
+
+.cs-fallback-detail {
+  margin: 0.75rem 0 0;
+  padding: 0.75rem 1rem;
+  max-width: 560px;
+  max-height: 160px;
+  overflow: auto;
+  text-align: left;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: var(--cs-mono);
+  font-size: 0.72rem;
+  line-height: 1.5;
+  color: #e3a1a1;
+  background: rgba(200, 80, 80, 0.08);
+  border: 1px solid rgba(200, 80, 80, 0.25);
+  border-radius: var(--cs-radius);
+}
+
+/* Controls bar */
+.cs-viewer-controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  padding: 1rem 1.25rem;
+  border-top: 1px solid var(--cs-line-soft);
+  background: var(--cs-bg-raised);
+}
+
+.cs-vc-btn {
+  font-family: var(--cs-mono);
+  font-size: 0.76rem;
+  letter-spacing: 0.02em;
+  color: var(--cs-text-dim);
+  background: transparent;
+  border: 1px solid var(--cs-line);
+  border-radius: var(--cs-radius);
+  padding: 0.55rem 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cs-vc-btn:hover {
+  color: var(--cs-text);
+  border-color: var(--cs-text-dim);
+}
+
+.cs-vc-btn.is-active {
+  color: var(--cs-bg);
+  background: var(--cs-accent);
+  border-color: var(--cs-accent);
+}
+
+.cs-vc-hint {
+  margin-left: auto;
+  font-family: var(--cs-mono);
+  font-size: 0.72rem;
+  color: var(--cs-text-faint);
+}
+
+/* Panel de capas */
+.cs-layers-panel {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.9rem 1.25rem 1.1rem;
+  border-top: 1px solid var(--cs-line-soft);
+  background: var(--cs-bg-raised);
+}
+
+.cs-layers-label {
+  font-family: var(--cs-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--cs-text-faint);
+  margin-right: 0.25rem;
+}
+
+.cs-layer-btn {
+  font-family: var(--cs-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.01em;
+  color: var(--cs-text);
+  background: transparent;
+  border: 1px solid var(--cs-accent);
+  border-radius: var(--cs-radius);
+  padding: 0.4rem 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.cs-layer-btn.is-active {
+  color: var(--cs-bg);
+  background: var(--cs-accent);
+}
+
+.cs-layer-btn:not(.is-active) {
+  color: var(--cs-text-faint);
+  border-color: var(--cs-line);
+  text-decoration: line-through;
+  text-decoration-color: var(--cs-text-faint);
+}
+
+.cs-layer-btn:hover {
+  border-color: var(--cs-text-dim);
+}
+
+.cs-layer-btn.is-unavailable {
+  opacity: 0.35;
+  cursor: not-allowed;
+  text-decoration: none;
+}
+
+.cs-layer-btn.is-unavailable:hover {
+  border-color: var(--cs-line);
+}
+
+/* ───────────────────── Info / Acordeón ───────────────────── */
+
+.cs-info {
+  padding: 1rem clamp(1.25rem, 5vw, 3rem) 6rem;
+}
+
+.cs-accordion {
+  max-width: 820px;
+  margin: 0 auto;
+  border-top: 1px solid var(--cs-line);
+}
+
+.cs-acc-item {
+  border-bottom: 1px solid var(--cs-line);
+}
+
+.cs-acc-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 1.5rem 0.25rem;
+  color: var(--cs-text);
+  text-align: left;
+}
+
+.cs-acc-num {
+  font-family: var(--cs-mono);
+  font-size: 0.8rem;
+  color: var(--cs-accent);
+  flex-shrink: 0;
+}
+
+.cs-acc-heading {
+  font-family: var(--cs-serif);
+  font-size: 1.4rem;
+  font-weight: 400;
+  flex: 1;
+}
+
+.cs-acc-chevron {
+  font-size: 1.3rem;
+  color: var(--cs-text-faint);
+  transition: transform 0.3s ease;
+  flex-shrink: 0;
+}
+
+.cs-acc-item.is-open .cs-acc-chevron {
+  transform: rotate(90deg);
+  color: var(--cs-accent);
+}
+
+.cs-acc-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.35s ease;
+}
+
+.cs-acc-item.is-open .cs-acc-panel {
+  grid-template-rows: 1fr;
+}
+
+.cs-acc-panel-inner {
+  overflow: hidden;
+}
+
+.cs-acc-item .cs-acc-panel-inner {
+  padding: 0 0.25rem;
+}
+
+.cs-acc-panel-inner p {
+  font-size: 0.98rem;
+  font-weight: 300;
+  color: var(--cs-text-dim);
+  margin: 0 0 1.1rem 0;
+  padding-bottom: 0.25rem;
+}
+
+.cs-acc-panel-inner p:last-child {
+  margin-bottom: 1.75rem;
+}
+
+.cs-inline-link {
+  color: var(--cs-accent);
+  border-bottom: 1px solid rgba(184, 144, 92, 0.4);
+  transition: border-color 0.2s ease;
+}
+
+.cs-inline-link:hover {
+  border-color: var(--cs-accent);
+}
+
+/* Ficha técnica */
+.cs-spec-list {
+  margin: 0 0 1.75rem;
+  padding-top: 0.25rem;
+}
+
+.cs-spec-row {
+  display: flex;
+  gap: 1.5rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--cs-line-soft);
+}
+
+.cs-spec-row:first-child {
+  border-top: 1px solid var(--cs-line-soft);
+}
+
+.cs-spec-row dt {
+  flex: 0 0 160px;
+  font-family: var(--cs-mono);
+  font-size: 0.76rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--cs-text-faint);
+}
+
+.cs-spec-row dd {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--cs-text);
+  font-weight: 300;
+}
+
+/* ───────────────────── Footer ───────────────────── */
+
+.cs-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 2rem clamp(1.25rem, 5vw, 3rem);
+  border-top: 1px solid var(--cs-line-soft);
+  font-family: var(--cs-mono);
+  font-size: 0.75rem;
+  color: var(--cs-text-faint);
+}
+
+.cs-footer-link {
+  color: var(--cs-text-dim);
+  transition: color 0.2s ease;
+}
+
+.cs-footer-link:hover {
+  color: var(--cs-accent);
+}
+
+/* ───────────────────── Responsive ───────────────────── */
+
+@media (max-width: 640px) {
+  .cs-spec-row {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .cs-spec-row dt {
+    flex: none;
+  }
+
+  .cs-vc-hint {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .cs-layers-panel {
+    gap: 0.4rem;
+    padding: 0.8rem 1rem 1rem;
+  }
+
+  .cs-layer-btn {
+    font-size: 0.66rem;
+    padding: 0.35rem 0.6rem;
+  }
+
+  /* ─── Visor 3D: más alto y de borde a borde en móvil ───
+     16/9 sobre un ancho de ~360-400px deja el visor muy bajito (~200px),
+     dejando poco espacio para apreciar el modelo. En pantallas angostas
+     se usa una proporción más cuadrada y se quita el margen lateral para
+     aprovechar todo el ancho disponible. */
+  .cs-viewer-section {
+    padding: 0.5rem 0 3rem;
+  }
+
+  .cs-viewer-frame {
+    border-left: none;
+    border-right: none;
+    border-radius: 0;
+  }
+
+  .cs-canvas-host {
+    aspect-ratio: 4 / 5;
+  }
+
+  .cs-viewer-controls {
+    padding: 0.85rem 1rem;
+    gap: 0.5rem;
+  }
+
+  .cs-vc-btn {
+    flex: 1 1 auto;
+    text-align: center;
+    padding: 0.6rem 0.5rem;
+  }
+
+  /* Hero: menos aire arriba/abajo y CTAs más compactos */
+  .cs-hero {
+    padding: clamp(2.5rem, 10vw, 4rem) 1.25rem 2rem;
+  }
+
+  .cs-hero-ctas {
+    gap: 1rem;
+  }
+}

@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Casa Sótara — Rogelio Salmona · APG Studio</title>
+  <meta name="description"
+    content="Visor 3D interactivo de la Casa Sótara / Casa en Río Frío (1997–2000), obra residencial de Rogelio Salmona y María Elvira Madriñán en Tabio, Cundinamarca. Estudio de caso — APG Studio, Pedro Gamboa Téllez." />
+  <meta property="og:title" content="Casa Sótara — Rogelio Salmona · APG Studio" />
+  <meta property="og:description"
+    content="Recorre en 3D la Casa Sótara de Rogelio Salmona. Estudio de caso arquitectónico." />
+  <meta property="og:type" content="website" />
+
+  <link rel="icon" type="image/png" sizes="32x32" href="../../images/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="../../images/favicon-16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="../../images/favicon-180.png" />
+  <link rel="shortcut icon" href="../../images/favicon.ico" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/casa-sotara.css" />
+
+  <!-- Import map: necesario porque sotara-viewer.js usa imports "desnudos"
+       (import * as THREE from 'three') -->
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+
+<body>
+
+  <!-- ─── Topbar ─── -->
+  <header class="cs-topbar">
+    <a href="../../index.html#projects" class="cs-back">← Volver a Proyectos</a>
+    <span class="cs-topbar-label">APG Studio · Estudio de caso</span>
+  </header>
+
+  <!-- ─── Hero ─── -->
+  <section class="cs-hero">
+    <p class="cs-eyebrow">Estudio de caso · Visor 3D interactivo</p>
+    <h1 class="cs-title">Casa Sótara</h1>
+    <p class="cs-architect">Rogelio Salmona y María Elvira Madriñán, 1997–2000</p>
+    <p class="cs-hero-note">
+      Modelo tridimensional navegable de la Casa Sótara, también conocida
+      como Casa en Río Frío, en Tabio, Cundinamarca. Explora los tres patios,
+      las bóvedas de ladrillo y el recorrido que atraviesa la tierra para
+      subir, finalmente, al cielo.
+    </p>
+    <div class="cs-hero-ctas">
+      <a href="#visor" class="cs-scroll-cue">
+        Ver el modelo 3D
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 4v16M6 14l6 6 6-6" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </a>
+      <a href="#ficha" class="cs-scroll-cue cs-scroll-cue--ghost">Ficha técnica</a>
+    </div>
+  </section>
+
+  <!-- ─── Visor 3D ─── -->
+  <section class="cs-viewer-section" id="visor">
+    <div class="cs-viewer-frame">
+      <div class="cs-canvas-host" id="csCanvasHost">
+        <canvas id="csCanvas"></canvas>
+
+        <!-- Loader -->
+        <div class="cs-loader" id="csLoader">
+          <div class="cs-loader-ring"></div>
+          <p class="cs-loader-text">Cargando modelo<span id="csLoaderPct"></span></p>
+        </div>
+
+        <!-- Fallback si el modelo no carga -->
+        <div class="cs-fallback" id="csFallback" hidden>
+          <svg class="cs-fallback-svg" viewBox="0 0 120 100" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M15 90 L15 45 L60 15 L105 45 L105 90 Z" stroke-linejoin="round" />
+            <path d="M40 90 L40 60 L80 60 L80 90" stroke-linejoin="round" />
+            <line x1="15" y1="90" x2="105" y2="90" />
+          </svg>
+          <p class="cs-fallback-title">No se pudo cargar el modelo</p>
+          <p class="cs-fallback-text">
+            Verifica que <code>muros.glb</code>, <code>cubiertas.glb</code>,
+            <code>puertasyventanas.glb</code> y
+            <code>lote.glb</code> estén en esta misma carpeta.
+          </p>
+        </div>
+      </div>
+
+      <!-- Controles -->
+      <div class="cs-viewer-controls">
+        <button type="button" class="cs-vc-btn" id="csResetView">Restablecer vista</button>
+        <button type="button" class="cs-vc-btn" id="csToggleAutorotate">
+          <span id="csAutorotateLabel">Rotación auto</span>
+        </button>
+        <button type="button" class="cs-vc-btn" id="csToggleWire">
+          <span id="csWireLabel">Modo alambre</span>
+        </button>
+        <span class="cs-vc-hint" id="csHint">Arrastra para orbitar · scroll para zoom</span>
+      </div>
+
+      <!-- Capas del modelo -->
+      <div class="cs-layers-panel" id="csLayersPanel">
+        <span class="cs-layers-label">Capas</span>
+        <button type="button" class="cs-layer-btn is-unavailable" data-layer="muros" disabled>Muros</button>
+        <button type="button" class="cs-layer-btn is-unavailable" data-layer="cubiertas" disabled>Cubiertas</button>
+        <button type="button" class="cs-layer-btn is-unavailable" data-layer="puertasyventanas" disabled>Puertas y
+          ventanas</button>
+        <button type="button" class="cs-layer-btn is-unavailable" data-layer="arboles" disabled>Árboles</button>
+        <button type="button" class="cs-layer-btn is-unavailable" data-layer="lote" disabled>Lote</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Información / Acordeón ─── -->
+  <section class="cs-info" id="ficha">
+    <div class="cs-accordion">
+
+      <div class="cs-acc-item is-open" data-acc>
+        <button class="cs-acc-trigger">
+          <span class="cs-acc-num">01</span>
+          <span class="cs-acc-heading">Historia</span>
+          <span class="cs-acc-chevron">›</span>
+        </button>
+        <div class="cs-acc-panel">
+          <div class="cs-acc-panel-inner">
+            <p>
+              Para esta casa bastó seguir un poema precolombino que dice:
+              «entrar en la casa es entrar en la tierra, subir al techo es
+              subir al cielo». El primer patio está semi-enterrado; para
+              entrar hay que tomar una ligera rampa curva, y aparecen
+              entonces, recortadas entre las curvaturas de las bóvedas, las
+              siluetas de las montañas cercanas.
+            </p>
+            <p>
+              El segundo patio se vislumbra a través de dos portales que
+              atraen como un imán. Al atravesarlos siguiendo un hilo de agua
+              viva, el piso cambia de color y de textura, y la pisada se
+              hace más firme: se ha entrado en la casa penetrando en la
+              tierra. En este patio central, una escalera invita a subir al
+              techo, a subir al cielo.
+            </p>
+            <p>
+              Un tercer patio, con una nueva escalera, marca el fin —o el
+              inicio— de un recorrido por el techo, formado por las ligeras
+              inclinaciones de las bóvedas. Desde lo alto de la casa, el
+              espacio cubierto y los espacios abiertos se hacen inteligibles:
+              es su razón de ser, formar parte del cielo y de la tierra.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="cs-acc-item" data-acc>
+        <button class="cs-acc-trigger">
+          <span class="cs-acc-num">02</span>
+          <span class="cs-acc-heading">Ficha técnica</span>
+          <span class="cs-acc-chevron">›</span>
+        </button>
+        <div class="cs-acc-panel">
+          <div class="cs-acc-panel-inner">
+            <dl class="cs-spec-list">
+              <div class="cs-spec-row">
+                <dt>Categoría</dt>
+                <dd>Bien de Interés Cultural del Ámbito Nacional</dd>
+              </div>
+              <div class="cs-spec-row">
+                <dt>Ubicación</dt>
+                <dd>Tabio, Cundinamarca, Colombia</dd>
+              </div>
+              <div class="cs-spec-row">
+                <dt>Fecha inicio</dt>
+                <dd>1997</dd>
+              </div>
+              <div class="cs-spec-row">
+                <dt>Fecha culminación</dt>
+                <dd>2000</dd>
+              </div>
+              <div class="cs-spec-row">
+                <dt>Autor</dt>
+                <dd>Rogelio Salmona y María Elvira Madriñán</dd>
+              </div>
+              <div class="cs-spec-row">
+                <dt>Entidad gestora</dt>
+                <dd>Rogelio Salmona y María Elvira Madriñán</dd>
+              </div>
+              <div class="cs-spec-row">
+                <dt>Empresa constructora</dt>
+                <dd>Rogelio Salmona S.A. y De Valdenebro Ing. Ltda.</dd>
+              </div>
+              <div class="cs-spec-row">
+                <dt>Área</dt>
+                <dd>150 m²</dd>
+              </div>
+              <div class="cs-spec-row">
+                <dt>Materialidad</dt>
+                <dd>Ladrillo, bóvedas de cañón y concreto</dd>
+              </div>
+              <div class="cs-spec-row">
+                <dt>Modelo 3D</dt>
+                <dd>Reconstrucción volumétrica en SketchUp, exportada a glTF</dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+      </div>
+
+      <div class="cs-acc-item" data-acc>
+        <button class="cs-acc-trigger">
+          <span class="cs-acc-num">03</span>
+          <span class="cs-acc-heading">Créditos del modelo</span>
+          <span class="cs-acc-chevron">›</span>
+        </button>
+        <div class="cs-acc-panel">
+          <div class="cs-acc-panel-inner">
+            <p>
+              Modelo volumétrico de referencia, elaborado con fines
+              académicos y de divulgación a partir de la planimetría y
+              fotografías publicadas de la obra. No sustituye los planos
+              originales del proyecto.
+            </p>
+            <p>
+              El proyecto recibió una mención en la Bienal Colombiana de
+              Arquitectura bajo el nombre "Casa en Río Frío", con Francisco
+              de Valdenebro como diseñador estructural y constructor junto a
+              Rogelio Salmona.
+            </p>
+            <p>
+              Fuente de referencia histórica:
+              <a href="https://www.fundacionrogeliosalmona.org/proyectos/casa-en-r%C3%ADo-fr%C3%ADo" target="_blank"
+                rel="noopener noreferrer" class="cs-inline-link">Fundación Rogelio Salmona — Casa en Río Frío</a>
+            </p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ─── Footer ─── -->
+  <footer class="cs-footer">
+    <p>© 2026 APG Studio — Pedro Gamboa Téllez · Estudio de caso, uso académico y de portafolio.</p>
+    <a href="../../index.html#projects" class="cs-footer-link">Volver a Proyectos →</a>
+  </footer>
+
+  <script type="module" src="js/sotara-viewer.js"></script>
+</body>
+
+</html>

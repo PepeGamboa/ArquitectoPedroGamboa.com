@@ -1175,7 +1175,8 @@ a.project-card {
   transition: background 0.4s ease;
 }
 
-.project-card--weiss:hover .project-img-weiss-overlay {
+.project-card--weiss:hover .project-img-weiss-overlay,
+.project-card--sotara:hover .project-img-weiss-overlay {
   background: linear-gradient(180deg, rgba(10, 10, 8, 0.05) 0%, rgba(10, 10, 8, 0.35) 100%);
 }
 
@@ -1190,7 +1191,8 @@ a.project-card {
   transition: transform 0.4s ease, opacity 0.3s ease;
 }
 
-.project-card--weiss:hover .project-img-weiss-icon {
+.project-card--weiss:hover .project-img-weiss-icon,
+.project-card--sotara:hover .project-img-weiss-icon {
   transform: scale(1.12);
   opacity: 1;
 }
