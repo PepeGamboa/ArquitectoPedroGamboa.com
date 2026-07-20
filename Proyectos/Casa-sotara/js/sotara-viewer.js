@@ -569,15 +569,17 @@ async function init() {
     layerRoots['arboles-perimetro'] = perimeterTrees;
   }
 
-  // ─── Árboles: carga bajo demanda (lazy), NO automática ───
-  // arboles.glb sigue siendo el archivo más pesado (~6.7 MB incluso ya
-  // optimizado). Dispararlo en segundo plano justo al terminar la casa
-  // competía por ancho de banda con lote.glb, que también arranca su
-  // descarga desde el inicio — en conexiones lentas eso alargaba
-  // notablemente la sensación de carga total. Ahora el botón "Árboles"
-  // queda disponible pero inactivo hasta que el usuario lo pulsa; los
-  // árboles perimetrales procedurales (ver más abajo) ya dan cobertura
-  // visual del lote sin necesidad de este archivo.
+  // ─── Árboles: activos por defecto ───
+  // El botón "Árboles" arranca marcado como activo y su archivo se
+  // dispara en segundo plano apenas termina de encuadrarse la casa, sin
+  // bloquear el loader. Así el visitante ve el lote arbolado desde la
+  // primera vista, sin tener que pulsar el botón.
+  if (treesBtn) treesBtn.classList.add('is-active');
+  ensureTreesLoaded().then((result) => {
+    if (!result.ok) return;
+    setLayerVisible('arboles', true);
+    setLayerVisible('arboles-perimetro', true);
+  });
 
   hideLoader();
   fallbackEl.hidden = true;
