@@ -38,8 +38,8 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 // "arboles": el archivo pesado — se carga solo la primera vez que se activa
 // el botón de esa capa.
 const HOUSE_LAYERS = [
-  { key: 'muros', url: 'muros.glb', label: 'Muros' },
   { key: 'cubiertas', url: 'cubiertas.glb', label: 'Cubiertas' },
+  { key: 'muros', url: 'muros.glb', label: 'Muros' },
   { key: 'puertasyventanas', url: 'puertasyventanas.glb', label: 'Puertas y ventanas' },
 ];
 const LOTE_LAYER = { key: 'lote', url: 'lote.glb', label: 'Lote' };
@@ -569,18 +569,15 @@ async function init() {
     layerRoots['arboles-perimetro'] = perimeterTrees;
   }
 
-  // ─── Árboles: activos por defecto ───
-  // arboles.glb (~21 MB, el archivo más pesado) se dispara en segundo plano
-  // igual que el lote, sin bloquear el primer render de la casa. Feedback
-  // optimista en el botón mientras carga; en cuanto termina, la capa se
-  // muestra sola y el botón queda marcado como activo — el usuario ya no
-  // tiene que pulsarlo para verlos.
-  if (treesBtn) treesBtn.classList.add('is-active');
-  ensureTreesLoaded().then((result) => {
-    if (!result.ok) return;
-    setLayerVisible('arboles', true);
-    setLayerVisible('arboles-perimetro', true);
-  });
+  // ─── Árboles: carga bajo demanda (lazy), NO automática ───
+  // arboles.glb sigue siendo el archivo más pesado (~6.7 MB incluso ya
+  // optimizado). Dispararlo en segundo plano justo al terminar la casa
+  // competía por ancho de banda con lote.glb, que también arranca su
+  // descarga desde el inicio — en conexiones lentas eso alargaba
+  // notablemente la sensación de carga total. Ahora el botón "Árboles"
+  // queda disponible pero inactivo hasta que el usuario lo pulsa; los
+  // árboles perimetrales procedurales (ver más abajo) ya dan cobertura
+  // visual del lote sin necesidad de este archivo.
 
   hideLoader();
   fallbackEl.hidden = true;
