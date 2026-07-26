@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Patrimonio — Proyectos de Interés Patrimonial | APG Studio</title>
+  <meta name="description"
+    content="Espacio dedicado a la documentación, análisis y difusión de proyectos con valor histórico, cultural y patrimonial. Visores 3D interactivos y enlaces oficiales de Bienes de Interés Cultural (BIC)." />
+
+  <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="images/favicon-180.png" />
+  <link rel="shortcut icon" href="images/favicon.ico" />
+
+  <base href="./" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css?v=3" />
+
+  <style>
+    /* ─── Patrimonio: estilos propios de esta página ─── */
+    #patrimonio-hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      background: var(--black);
+      overflow: hidden;
+      padding-top: var(--nav-h);
+    }
+
+    #patrimonio-hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: linear-gradient(rgba(200, 169, 126, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(200, 169, 126, 0.05) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+    }
+
+    .ph-layout {
+      position: relative;
+      z-index: 1;
+      max-width: var(--max-w);
+      margin: 0 auto;
+      width: 100%;
+      padding: 60px 32px;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 48px;
+      align-items: center;
+    }
+
+    .ph-eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--gold);
+      font-size: 0.72rem;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      margin-bottom: 22px;
+    }
+
+    .ph-title {
+      font-family: var(--font-display);
+      font-weight: 300;
+      font-size: clamp(2.4rem, 4.4vw, 3.6rem);
+      line-height: 1.12;
+      color: var(--white);
+      margin-bottom: 22px;
+    }
+
+    .ph-title em {
+      font-style: italic;
+      color: var(--gold-light);
+    }
+
+    .ph-sub {
+      color: var(--light);
+      font-size: 0.95rem;
+      line-height: 1.75;
+      max-width: 480px;
+      margin-bottom: 34px;
+    }
+
+    .ph-img {
+      display: flex;
+      justify-content: center;
+    }
+
+    .ph-img img {
+      max-width: 100%;
+      height: auto;
+      filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.55));
+    }
+
+    .ph-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--light);
+      font-size: 0.78rem;
+      text-decoration: none;
+      margin-bottom: 28px;
+      transition: color 0.2s;
+    }
+
+    .ph-back:hover {
+      color: var(--gold-light);
+    }
+
+    /* ─── Secciones internas (Visor 3D / BIC) ─── */
+    .ph-section {
+      background: var(--dark);
+      border-top: 1px solid var(--gray);
+    }
+
+    .ph-section.alt {
+      background: var(--black);
+    }
+
+    .ph-section .section-inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: var(--section-pad) 32px;
+    }
+
+    .ph-section-head {
+      max-width: 620px;
+      margin-bottom: 48px;
+    }
+
+    .ph-section-head h2 {
+      font-family: var(--font-display);
+      font-weight: 300;
+      font-size: 2.1rem;
+      color: var(--white);
+      margin-bottom: 14px;
+    }
+
+    .ph-section-head p {
+      color: var(--mid);
+      font-size: 0.9rem;
+      line-height: 1.7;
+    }
+
+    /* Visor 3D grid: reutiliza .project-card / .project-card--weiss */
+    .ph-viewer-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+    }
+
+    .ph-viewer-grid .project-card.soon {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      min-height: 320px;
+      color: var(--mid);
+      padding: 32px;
+    }
+
+    .ph-viewer-grid .project-card.soon span.plus {
+      font-family: var(--font-display);
+      font-size: 2.4rem;
+      color: var(--gold);
+      margin-bottom: 14px;
+    }
+
+    .ph-viewer-grid .project-card.soon p {
+      font-size: 0.82rem;
+      line-height: 1.6;
+      max-width: 260px;
+    }
+
+    /* BIC resource categories */
+    .bic-category {
+      margin-bottom: 44px;
+    }
+
+    .bic-category:last-child {
+      margin-bottom: 0;
+    }
+
+    .bic-category-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.68rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 18px;
+    }
+
+    .bic-category-title::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--gray);
+    }
+
+    .bic-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    .bic-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 22px 24px;
+      border: 1px solid var(--gray);
+      text-decoration: none;
+      color: inherit;
+      transition: border-color 0.2s, background 0.2s, transform 0.2s;
+    }
+
+    .bic-card:hover {
+      border-color: var(--gold);
+      background: var(--gold-dim);
+      transform: translateY(-2px);
+    }
+
+    .bic-icon {
+      font-size: 1.2rem;
+      color: var(--gold);
+      min-width: 26px;
+      text-align: center;
+      margin-top: 2px;
+    }
+
+    .bic-info h3 {
+      font-family: var(--font-display);
+      font-weight: 400;
+      font-size: 1.02rem;
+      color: var(--white);
+      margin-bottom: 6px;
+    }
+
+    .bic-info p {
+      color: var(--mid);
+      font-size: 0.78rem;
+      line-height: 1.55;
+      margin-bottom: 6px;
+    }
+
+    .bic-info .bic-url {
+      display: block;
+      color: var(--gold-light);
+      font-size: 0.7rem;
+      word-break: break-all;
+    }
+
+    @media (max-width: 860px) {
+
+      .ph-layout {
+        grid-template-columns: 1fr;
+        text-align: left;
+      }
+
+      .ph-viewer-grid,
+      .bic-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- NAV -->
+  <nav id="navbar" class="scrolled">
+    <div class="nav-inner">
+      <a href="index.html" class="logo">
+        <img src="images/favicon-192.png" alt="APG Studio" class="logo-img"
+          style="border-radius:50%;width:44px;height:44px;object-fit:cover;" />
+        <span class="logo-text">APG<em>Studio</em></span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html#about">Sobre mí</a></li>
+        <li><a href="index.html#experience">Experiencia</a></li>
+        <li><a href="index.html#projects">Proyectos</a></li>
+        <li><a href="patrimonio.html" style="color:var(--gold-light);">Patrimonio</a></li>
+        <li><a href="index.html#contact">Contacto</a></li>
+      </ul>
+      <button class="menu-toggle" id="menuToggle" aria-label="Menu">☰</button>
+    </div>
+    <div class="mobile-menu" id="mobileMenu">
+      <a href="index.html#about">Sobre mí</a>
+      <a href="index.html#experience">Experiencia</a>
+      <a href="index.html#projects">Proyectos</a>
+      <a href="patrimonio.html">Patrimonio</a>
+      <a href="index.html#contact">Contacto</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section id="patrimonio-hero">
+    <div class="ph-layout">
+      <div class="ph-content">
+        <a href="index.html" class="ph-back">← Volver al inicio</a>
+        <p class="ph-eyebrow">🏛 Nuevo espacio</p>
+        <h1 class="ph-title">Proyectos de <em>Interés Patrimonial</em></h1>
+        <p class="ph-sub">Un espacio dedicado a la documentación, análisis y difusión de proyectos
+          arquitectónicos con valor histórico, cultural y patrimonial: modelos 3D navegables de
+          obras de referencia y una selección curada de plataformas y normativa oficial sobre
+          Bienes de Interés Cultural (BIC) en Colombia.</p>
+        <div class="hero-cta">
+          <a href="#visor3d" class="btn-primary">→ Explorar Visor 3D</a>
+          <a href="#bic" class="btn-outline">Enlaces BIC</a>
+        </div>
+      </div>
+      <div class="ph-img">
+        <img src="images/libro.png" alt="Proyectos de Interés Patrimonial" />
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── VISOR 3D ─── -->
+  <section class="ph-section" id="visor3d">
+    <div class="section-inner">
+      <div class="ph-section-head">
+        <p class="section-eyebrow">Visor 3D Interactivo</p>
+        <h2>Modelos navegables de obras patrimoniales</h2>
+        <p>Reconstrucciones volumétricas realizadas en SketchUp y exportadas a Three.js,
+          con recorrido interactivo y ficha técnica de cada proyecto.</p>
+      </div>
+
+      <div class="ph-viewer-grid">
+        <a href="Proyectos/casa-weiss/index.html" class="project-card project-card--weiss">
+          <div class="project-img project-img-weiss"
+            style="background-image:url('images/casa-weiss-preview.jpg');background-size:cover;background-position:center;">
+            <div class="project-img-weiss-overlay"></div>
+            <svg class="project-img-weiss-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="1.8">
+              <circle cx="12" cy="12" r="10" />
+              <path d="M9.5 8.5v7l6-3.5-6-3.5z" fill="currentColor" stroke="none" />
+            </svg>
+            <span class="project-img-weiss-badge">Visor 3D interactivo</span>
+          </div>
+          <div class="project-info">
+            <span class="project-tag">Patrimonial · Estudio de caso</span>
+            <h3>Casa Weiss — Louis I. Kahn, 1950</h3>
+            <p>Modelo 3D navegable de la residencia Weiss. Reconstrucción volumétrica de una obra
+              temprana de Louis I. Kahn, con recorrido interactivo y ficha técnica.</p>
+          </div>
+        </a>
+
+        <a href="Proyectos/Casa-sotara/index.html" class="project-card project-card--weiss project-card--sotara">
+          <div class="project-img project-img-weiss"
+            style="background-image:url('images/aa.png');background-size:cover;background-position:center;">
+            <div class="project-img-weiss-overlay"></div>
+            <svg class="project-img-weiss-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="1.8">
+              <circle cx="12" cy="12" r="10" />
+              <path d="M9.5 8.5v7l6-3.5-6-3.5z" fill="currentColor" stroke="none" />
+            </svg>
+            <span class="project-img-weiss-badge">Visor 3D interactivo</span>
+          </div>
+          <div class="project-info">
+            <span class="project-tag">Patrimonial · Estudio de caso</span>
+            <h3>Casa Sotará — Rogelio Salmona, 1997</h3>
+            <p>Modelo 3D navegable de la Casa Sotará. Recorrido interactivo y ficha técnica del
+              proyecto.</p>
+          </div>
+        </a>
+
+        <div class="project-card soon">
+          <span class="plus">+</span>
+          <p>Próximamente: nuevos modelos 3D de proyectos con valor patrimonial.
+            Escríbeme si quieres proponer una obra para documentar.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── BIC LINKS ─── -->
+  <section class="ph-section alt" id="bic">
+    <div class="section-inner">
+      <div class="ph-section-head">
+        <p class="section-eyebrow">Bienes de Interés Cultural</p>
+        <h2>Enlaces y recursos oficiales (BIC)</h2>
+        <p>Plataformas, normativa y archivos digitales de referencia para la investigación y
+          valoración de bienes patrimoniales en Colombia.</p>
+      </div>
+
+      <!-- Archivos y bibliotecas digitales -->
+      <div class="bic-category">
+        <p class="bic-category-title">Archivos y bibliotecas digitales</p>
+        <div class="bic-grid">
+          <a href="https://biblioteca.archivogeneral.gov.co/pmb/opac_css/" target="_blank" rel="noopener"
+            class="bic-card">
+            <span class="bic-icon">📚</span>
+            <div class="bic-info">
+              <h3>Biblioteca Digital — Archivo General de la Nación</h3>
+              <p>Catálogo y consulta de fondos documentales históricos.</p>
+              <span class="bic-url">biblioteca.archivogeneral.gov.co</span>
+            </div>
+          </a>
+          <a href="https://www.loc.gov/collections/world-digital-library/about-this-collection/" target="_blank"
+            rel="noopener" class="bic-card">
+            <span class="bic-icon">🌐</span>
+            <div class="bic-info">
+              <h3>Biblioteca Digital Mundial — Library of Congress</h3>
+              <p>Colección internacional de documentos y materiales patrimoniales digitalizados.</p>
+              <span class="bic-url">loc.gov/collections/world-digital-library</span>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <!-- Normativa y documentos técnicos -->
+      <div class="bic-category">
+        <p class="bic-category-title">Normativa y documentos técnicos (PDF)</p>
+        <div class="bic-grid">
+          <a href="https://idpc.gov.co/publicaciones/descargas/patrisostenible.pdf" target="_blank" rel="noopener"
+            class="bic-card">
+            <span class="bic-icon">📄</span>
+            <div class="bic-info">
+              <h3>Patrimonio Sostenible — IDPC</h3>
+              <p>Documento técnico sobre sostenibilidad aplicada al patrimonio cultural.</p>
+              <span class="bic-url">idpc.gov.co · PDF</span>
+            </div>
+          </a>
+          <a href="https://www.mincultura.gov.co/direcciones/patrimonio-y-memoria/Documents/2025/LISTA_DE_BIENES_DE_INTER%C3%89S_CULTURAL_DEL_%C3%81MBITO_NACIONAL_octubre_2025.pdf"
+            target="_blank" rel="noopener" class="bic-card">
+            <span class="bic-icon">📋</span>
+            <div class="bic-info">
+              <h3>Lista de Bienes de Interés Cultural del Ámbito Nacional</h3>
+              <p>Listado oficial actualizado — Ministerio de Cultura (octubre 2025).</p>
+              <span class="bic-url">mincultura.gov.co · PDF</span>
+            </div>
+          </a>
+          <a href="https://www.sdp.gov.co/sites/default/files/generales/guia_elaboracion_estudios_de_valoracion_patrimonial.pdf"
+            target="_blank" rel="noopener" class="bic-card">
+            <span class="bic-icon">📐</span>
+            <div class="bic-info">
+              <h3>Guía para la Elaboración de Estudios de Valoración Patrimonial</h3>
+              <p>Metodología oficial — Secretaría Distrital de Planeación (SDP).</p>
+              <span class="bic-url">sdp.gov.co · PDF</span>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <!-- Plataformas y visores oficiales -->
+      <div class="bic-category">
+        <p class="bic-category-title">Plataformas, visores y datos abiertos</p>
+        <div class="bic-grid">
+          <a href="https://sisbic.idpc.gov.co/" target="_blank" rel="noopener" class="bic-card">
+            <span class="bic-icon">🗺️</span>
+            <div class="bic-info">
+              <h3>SISBIC — Sistema de Información de BIC</h3>
+              <p>Consulta oficial de Bienes de Interés Cultural — IDPC.</p>
+              <span class="bic-url">sisbic.idpc.gov.co</span>
+            </div>
+          </a>
+          <a href="https://datosabiertos.bogota.gov.co/en/dataset/bien-interes-cultural-bogota-d-c" target="_blank"
+            rel="noopener" class="bic-card">
+            <span class="bic-icon">📊</span>
+            <div class="bic-info">
+              <h3>Bienes de Interés Cultural de Bogotá D.C.</h3>
+              <p>Conjunto de datos abiertos del Distrito.</p>
+              <span class="bic-url">datosabiertos.bogota.gov.co</span>
+            </div>
+          </a>
+          <a href="https://www.sdp.gov.co/gestion-territorial/patrimonio-y-renovacion-urbana/bienes-de-interes-cultural"
+            target="_blank" rel="noopener" class="bic-card">
+            <span class="bic-icon">🏛️</span>
+            <div class="bic-info">
+              <h3>Bienes de Interés Cultural — SDP</h3>
+              <p>Sección oficial de patrimonio y renovación urbana.</p>
+              <span class="bic-url">sdp.gov.co</span>
+            </div>
+          </a>
+          <a href="https://sinu.sdp.gov.co/visor/" target="_blank" rel="noopener" class="bic-card">
+            <span class="bic-icon">🧭</span>
+            <div class="bic-info">
+              <h3>Visor SINU — SDP</h3>
+              <p>Sistema de Información del Norma Urbanística de Bogotá.</p>
+              <span class="bic-url">sinu.sdp.gov.co/visor</span>
+            </div>
+          </a>
+          <a href="https://sinu.sdp.gov.co:2443/#/3d/predial" target="_blank" rel="noopener" class="bic-card">
+            <span class="bic-icon">🧱</span>
+            <div class="bic-info">
+              <h3>Visor 3D Predial — SINU</h3>
+              <p>Consulta predial en visualización tridimensional.</p>
+              <span class="bic-url">sinu.sdp.gov.co:2443/#/3d/predial</span>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT (compacto) -->
+  <section id="contact" style="padding-top:var(--section-pad);">
+    <div class="section-inner">
+      <p class="section-eyebrow">Contacto</p>
+      <h2>¿Tienes un proyecto patrimonial en mente?</h2>
+      <p class="contact-sub">Escríbeme si quieres documentar un proyecto de valor histórico o
+        cultural con visor 3D interactivo.</p>
+      <div class="contact-channels">
+        <a href="mailto:arquitectopedrogamboa@gmail.com" class="contact-card email">
+          <div class="contact-icon">✉</div>
+          <div class="contact-info">
+            <span class="contact-label">Correo profesional</span>
+            <span class="contact-value">arquitectopedrogamboa@gmail.com</span>
+          </div>
+        </a>
+        <a href="https://wa.me/573142568410?text=Hola%20Pedro,%20me%20interesa%20un%20proyecto%20patrimonial"
+          target="_blank" class="contact-card whatsapp">
+          <div class="contact-icon">💬</div>
+          <div class="contact-info">
+            <span class="contact-label">WhatsApp</span>
+            <span class="contact-value">+57 314 256 8410</span>
+          </div>
+        </a>
+        <a href="https://arquitectopedrogamboa.com/" target="_blank" class="contact-card web">
+          <div class="contact-icon">🌐</div>
+          <div class="contact-info">
+            <span class="contact-label">Web</span>
+            <span class="contact-value">arquitectopedrogamboa.com</span>
+          </div>
+        </a>
+      </div>
+      <div class="contact-location">
+        <p>📍 Chía, Cundinamarca, Colombia · Disponible globalmente de forma remota</p>
+      </div>
+    </div>
+  </section>
+
+  <footer id="footer">
+    <div class="footer-inner">
+      <p class="footer-copy">© 2026 Pedro Gamboa Téllez — APG Studio</p>
+      <div class="footer-links">
+        <a href="index.html">Inicio</a>
+        <a href="patrimonio.html">Patrimonio</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const menuToggle = document.getElementById('menuToggle');
+    const mobileMenu = document.getElementById('mobileMenu');
+    if (menuToggle && mobileMenu) {
+      menuToggle.addEventListener('click', () => mobileMenu.classList.toggle('open'));
+    }
+  </script>
+</body>
+
+</html>
