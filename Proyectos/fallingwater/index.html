@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fallingwater — Frank Lloyd Wright · APG Studio</title>
+  <meta name="description"
+    content="Visor 3D interactivo de Fallingwater / Casa de la Cascada (1935–1939), obra cumbre de la arquitectura orgánica de Frank Lloyd Wright en Bear Run, Pensilvania. Estudio de caso — APG Studio, Pedro Gamboa Téllez." />
+  <meta property="og:title" content="Fallingwater — Frank Lloyd Wright · APG Studio" />
+  <meta property="og:description"
+    content="Recorre en 3D Fallingwater, la Casa de la Cascada de Frank Lloyd Wright. Estudio de caso arquitectónico." />
+  <meta property="og:type" content="website" />
+
+  <link rel="icon" type="image/png" sizes="32x32" href="../../images/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="../../images/favicon-16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="../../images/favicon-180.png" />
+  <link rel="shortcut icon" href="../../images/favicon.ico" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/fallingwater.css" />
+
+  <!-- Import map: necesario porque fallingwater-viewer.js usa imports "desnudos"
+       (import * as THREE from 'three') -->
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+
+<body>
+
+  <!-- ─── Topbar ─── -->
+  <header class="fw-topbar">
+    <a href="../../index.html#projects" class="fw-back">← Volver a Proyectos</a>
+    <span class="fw-topbar-label">APG Studio · Estudio de caso</span>
+  </header>
+
+  <!-- ─── Hero ─── -->
+  <section class="fw-hero">
+    <p class="fw-eyebrow">Estudio de caso · Visor 3D interactivo</p>
+    <h1 class="fw-title">Fallingwater</h1>
+    <p class="fw-architect">Frank Lloyd Wright, 1935–1939</p>
+    <p class="fw-hero-note">
+      Modelo tridimensional navegable de Fallingwater (Casa de la Cascada),
+      en Bear Run, Pensilvania. Explora las bandejas de hormigón armado en
+      voladizo, la piedra arenisca local y el arroyo sobre el que la casa
+      fue construida como parte integral de su propia vida.
+    </p>
+    <div class="fw-hero-ctas">
+      <a href="#visor" class="fw-scroll-cue">
+        Ver el modelo 3D
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 4v16M6 14l6 6 6-6" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </a>
+      <a href="#ficha" class="fw-scroll-cue fw-scroll-cue--ghost">Ficha técnica</a>
+    </div>
+  </section>
+
+  <!-- ─── Visor 3D ─── -->
+  <section class="fw-viewer-section" id="visor">
+    <div class="fw-viewer-frame">
+      <div class="fw-canvas-host" id="fwCanvasHost">
+        <canvas id="fwCanvas"></canvas>
+
+        <!-- Loader -->
+        <div class="fw-loader" id="fwLoader">
+          <div class="fw-loader-ring"></div>
+          <p class="fw-loader-text">Cargando modelo<span id="fwLoaderPct"></span></p>
+        </div>
+
+        <!-- Fallback si el modelo no carga -->
+        <div class="fw-fallback" id="fwFallback" hidden>
+          <svg class="fw-fallback-svg" viewBox="0 0 120 100" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M15 90 L15 45 L60 15 L105 45 L105 90 Z" stroke-linejoin="round" />
+            <path d="M40 90 L40 60 L80 60 L80 90" stroke-linejoin="round" />
+            <line x1="15" y1="90" x2="105" y2="90" />
+          </svg>
+          <p class="fw-fallback-title">No se pudo cargar el modelo</p>
+          <p class="fw-fallback-text">
+            Verifica que <code>cubierta.glb</code>, <code>muros.glb</code>,
+            <code>carpinterias.glb</code>, <code>pisos.glb</code>,
+            <code>pisos2.glb</code>, <code>contexto.glb</code> y
+            <code>cascada.glb</code> estén en esta misma carpeta.
+          </p>
+        </div>
+      </div>
+
+      <!-- Controles -->
+      <div class="fw-viewer-controls">
+        <button type="button" class="fw-vc-btn" id="fwResetView">Restablecer vista</button>
+        <button type="button" class="fw-vc-btn" id="fwToggleAutorotate">
+          <span id="fwAutorotateLabel">Rotación auto</span>
+        </button>
+        <button type="button" class="fw-vc-btn" id="fwToggleWire">
+          <span id="fwWireLabel">Modo alambre</span>
+        </button>
+        <span class="fw-vc-hint" id="fwHint">Arrastra para orbitar · scroll para zoom</span>
+      </div>
+
+      <!-- Capas del modelo -->
+      <div class="fw-layers-panel" id="fwLayersPanel">
+        <span class="fw-layers-label">Capas</span>
+        <button type="button" class="fw-layer-btn is-unavailable" data-layer="cubierta" disabled>Cubierta</button>
+        <button type="button" class="fw-layer-btn is-unavailable" data-layer="muros" disabled>Muros</button>
+        <button type="button" class="fw-layer-btn is-unavailable" data-layer="carpinterias" disabled>Carpinterías</button>
+        <button type="button" class="fw-layer-btn is-unavailable" data-layer="pisos" disabled>Pisos</button>
+        <button type="button" class="fw-layer-btn is-unavailable" data-layer="pisos2" disabled>Pisos 2</button>
+        <button type="button" class="fw-layer-btn is-unavailable" data-layer="contexto" disabled>Contexto</button>
+        <button type="button" class="fw-layer-btn is-unavailable" data-layer="cascada" disabled>Cascada</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Información / Acordeón ─── -->
+  <section class="fw-info" id="ficha">
+    <div class="fw-accordion">
+
+      <div class="fw-acc-item is-open" data-acc>
+        <button class="fw-acc-trigger">
+          <span class="fw-acc-num">01</span>
+          <span class="fw-acc-heading">Historia</span>
+          <span class="fw-acc-chevron">›</span>
+        </button>
+        <div class="fw-acc-panel">
+          <div class="fw-acc-panel-inner">
+            <p>
+              Fallingwater es la obra cumbre de Wright en arquitectura
+              orgánica y, según el Instituto Americano de Arquitectos, la
+              "mejor obra de arquitectura estadounidense de todos los
+              tiempos". Sus propietarios, Edgar y Liliane Kaufmann, eran una
+              destacada pareja de Pittsburgh, conocidos por su estilo y
+              gusto inconfundibles. Conocieron a Wright en 1934, cuando su
+              hijo, Edgar Jr., pasó seis meses en el programa Taliesin
+              Fellowship, y le encargaron una casa de verano para el retiro
+              de fin de semana de la familia en Bear Run, Pensilvania.
+            </p>
+            <p>
+              Decidido a construir sobre el arroyo que atravesaba la
+              propiedad —en lugar de simplemente ofrecer una vista hacia
+              él—, Wright ancló una serie de bandejas de hormigón armado a
+              la roca natural. Terrazas en voladizo de arenisca local se
+              integran con las formaciones rocosas, dando la impresión de
+              flotar sobre el arroyo. La entrada, la sala y el comedor de la
+              planta baja se fusionan en un espacio continuo, mientras una
+              trampilla desciende hasta el agua por una escalera suspendida.
+              En 1939 se añadió una casa de huéspedes en la ladera,
+              conectada por una pasarela cubierta.
+            </p>
+            <p>
+              En 1963 los Kaufmann donaron la propiedad a la Western
+              Pennsylvania Conservancy junto con más de 1.500 acres de
+              terreno circundante. Abrió como museo en 1964 y desde
+              entonces ha recibido a más de cinco millones de visitantes;
+              en 2019 fue declarada Patrimonio Mundial por la UNESCO.
+            </p>
+            <p class="fw-quote">
+              "La gran arquitectura, como cualquier gran arte, te transporta
+              a un lugar al que las palabras no pueden llevarte. Fallingwater
+              lo logra de la misma manera que la catedral de Chartres."
+              <span class="fw-quote-cite">— Paul Goldberger, crítico de arquitectura, Premio Pulitzer</span>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="fw-acc-item" data-acc>
+        <button class="fw-acc-trigger">
+          <span class="fw-acc-num">02</span>
+          <span class="fw-acc-heading">Ficha técnica</span>
+          <span class="fw-acc-chevron">›</span>
+        </button>
+        <div class="fw-acc-panel">
+          <div class="fw-acc-panel-inner">
+            <dl class="fw-spec-list">
+              <div class="fw-spec-row">
+                <dt>Arquitecto</dt>
+                <dd>Frank Lloyd Wright</dd>
+              </div>
+              <div class="fw-spec-row">
+                <dt>Construido</dt>
+                <dd>1935 (proyecto) · 1936–1937 (casa principal) · 1939 (casa de huéspedes)</dd>
+              </div>
+              <div class="fw-spec-row">
+                <dt>Cliente</dt>
+                <dd>Edgar J. Kaufmann y su esposa Liliane</dd>
+              </div>
+              <div class="fw-spec-row">
+                <dt>Ubicación</dt>
+                <dd>Ruta 381 Sur, Mill Run, Fayette County, Pensilvania, EE. UU.</dd>
+              </div>
+              <div class="fw-spec-row">
+                <dt>Estado</dt>
+                <dd>Monumento Histórico Nacional · Patrimonio Mundial UNESCO (2019).
+                  Abierto al público con visitas guiadas.</dd>
+              </div>
+              <div class="fw-spec-row">
+                <dt>Materialidad</dt>
+                <dd>Hormigón armado en voladizo, piedra arenisca local y acero (Cherokee red)</dd>
+              </div>
+              <div class="fw-spec-row">
+                <dt>Sitio web</dt>
+                <dd><a href="https://fallingwater.org" target="_blank" rel="noopener noreferrer" class="fw-inline-link">fallingwater.org</a></dd>
+              </div>
+              <div class="fw-spec-row">
+                <dt>Modelo 3D</dt>
+                <dd>Reconstrucción volumétrica en SketchUp, exportada a glTF y separada en 6 capas</dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+      </div>
+
+      <div class="fw-acc-item" data-acc>
+        <button class="fw-acc-trigger">
+          <span class="fw-acc-num">03</span>
+          <span class="fw-acc-heading">Créditos del modelo</span>
+          <span class="fw-acc-chevron">›</span>
+        </button>
+        <div class="fw-acc-panel">
+          <div class="fw-acc-panel-inner">
+            <p>
+              Modelo volumétrico de referencia, elaborado con fines
+              académicos y de divulgación a partir de la planimetría y
+              fotografías publicadas de la obra. No sustituye los planos
+              originales del proyecto ni los archivos oficiales de la
+              Western Pennsylvania Conservancy.
+            </p>
+            <p>
+              Fuente de referencia histórica:
+              <a href="https://franklloydwright.org/site/fallingwater/" target="_blank" rel="noopener noreferrer" class="fw-inline-link">Frank Lloyd Wright Foundation — Fallingwater</a>
+              ·
+              <a href="https://fallingwater.org" target="_blank" rel="noopener noreferrer" class="fw-inline-link">fallingwater.org</a>
+            </p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ─── Footer ─── -->
+  <footer class="fw-footer">
+    <p>© 2026 APG Studio — Pedro Gamboa Téllez · Estudio de caso, uso académico y de portafolio.</p>
+    <a href="../../index.html#projects" class="fw-footer-link">Volver a Proyectos →</a>
+  </footer>
+
+  <script type="module" src="js/fallingwater-viewer.js"></script>
+</body>
+
+</html>
