@@ -3,19 +3,22 @@
 //
 // Igual que Casa Sotará, el modelo llega separado en varios archivos .glb
 // independientes en vez de un único .glb con grupos internos nombrados:
-// cubierta.glb, muros.glb, carpinterias.glb, pisos.glb, pisos2.glb,
-// contexto.glb, cascada.glb y arboles.glb — los ocho exportados desde el
-// mismo modelo de SketchUp y comparten sistema de coordenadas. Cada uno
-// tiene su propio botón en el panel de capas (ver LAYERS más abajo).
+// muros.glb, carpinterias.glb, contexto.glb, cascada.glb y arboles.glb,
+// más "placas" (cubierta.glb + pisos.glb, fusionados en una sola capa
+// porque el criterio geométrico que los separaba —cara horizontal libre
+// arriba = cubierta, cara horizontal tapada por otra losa = piso— no
+// distinguía bien entre ambos y terminaban solapándose visualmente) y
+// "caminos" (antes "pisos2", ahora servida desde caminos.glb). Todos
+// comparten sistema de coordenadas y cada uno tiene su propio botón en
+// el panel de capas (ver LAYERS más abajo).
 //
 // La separación por capas se hizo de forma automática a partir de los
 // materiales originales (muros, carpinterías y cascada) y, para las
 // superficies con material genérico sin nombre útil, con un criterio
-// geométrico: caras horizontales sin nada por encima → cubierta; caras
-// horizontales cubiertas por otra losa → pisos; caras verticales → muros.
-// Ningún archivo pesa lo suficiente (el más grande, muros.glb, ronda
-// 470 KB) como para justificar carga diferida: las seis se piden en
-// paralelo y bloquean el loader juntas.
+// geométrico: caras horizontales → placas (cubierta + pisos); caras
+// verticales → muros. Ningún archivo pesa lo suficiente (el más grande,
+// muros.glb, ronda 470 KB) como para justificar carga diferida: todos se
+// piden en paralelo y bloquean el loader juntos.
 
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -33,11 +36,12 @@ import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 // encuadre. Las 8 capas se cargan y se muestran igual desde el inicio —
 // solo cambia qué geometría se usa para calcular dónde poner la cámara.
 const HOUSE_LAYERS = [
-  { key: 'cubierta', url: 'cubierta.glb', label: 'Cubierta' },
+  // "placas" agrupa cubierta.glb + pisos.glb bajo un solo botón: se
+  // cargan ambos archivos y sus mallas se unen dentro de una misma capa.
+  { key: 'placas', urls: ['cubierta.glb', 'pisos.glb'], label: 'Placas' },
   { key: 'muros', url: 'muros.glb', label: 'Muros' },
   { key: 'carpinterias', url: 'carpinterias.glb', label: 'Carpinterías' },
-  { key: 'pisos', url: 'pisos.glb', label: 'Pisos' },
-  { key: 'pisos2', url: 'pisos2.glb', label: 'Pisos 2' },
+  { key: 'caminos', url: 'caminos.glb', label: 'Caminos' },
 ];
 const SITE_LAYERS = [
   { key: 'contexto', url: 'contexto.glb', label: 'Contexto' },
@@ -47,15 +51,16 @@ const SITE_LAYERS = [
 const LAYERS = [...HOUSE_LAYERS, ...SITE_LAYERS];
 
 // contexto.glb trae, por un error en la exportación desde SketchUp, piezas
-// de piso duplicadas que en realidad pertenecen a pisos.glb. Un primer
-// intento las excluyó por nombre de nodo, pero la pieza grande (la losa
-// con el hueco y la escalera) resultó venir de otro nodo sin identificar
-// a simple vista. En vez de adivinar nombres, la detección se hace en
-// tiempo real en removeContextoDuplicatesOfPisos() (más abajo): una vez
-// cargadas ambas capas, se compara la caja delimitadora de cada malla de
-// "contexto" contra las de "pisos" con la geometría ya descomprimida por
-// el navegador, y se oculta cualquier pieza de contexto que se solape con
-// una pieza real de pisos y tenga un volumen comparable (así no se
+// de piso duplicadas que en realidad pertenecen a "placas" (cubierta.glb +
+// pisos.glb). Un primer intento las excluyó por nombre de nodo, pero la
+// pieza grande (la losa con el hueco y la escalera) resultó venir de otro
+// nodo sin identificar a simple vista. En vez de adivinar nombres, la
+// detección se hace en tiempo real en removeContextoDuplicatesOfPisos()
+// (más abajo): una vez cargadas ambas capas, se compara la caja
+// delimitadora de cada malla de "contexto" contra las de "placas" con la
+// geometría ya descomprimida por el navegador, y se oculta cualquier
+// pieza de contexto que se solape con una pieza real de placas y tenga
+// un volumen comparable (así no se
 // confunde con el terreno, que envuelve toda la zona de la casa).
 
 // ─── Detección de móvil / GPU limitada ───
@@ -226,36 +231,89 @@ const loader = new GLTFLoader();
 loader.setDRACOLoader(dracoLoader);
 loader.setMeshoptDecoder(MeshoptDecoder);
 
-function loadLayer(def, onProgress) {
-  return new Promise((resolve) => {
-    loader.load(
-      def.url,
-      (gltf) => {
-        const root = gltf.scene;
-        root.traverse((child) => {
-          if (child.isMesh) {
-            child.castShadow = true;
-            child.receiveShadow = true;
-            const mats = Array.isArray(child.material) ? child.material : [child.material];
-            mats.forEach((m) => {
-              if (m && 'roughness' in m) m.envMapIntensity = 1.15;
-            });
-          }
-        });
-        worldRoot.add(root);
-        layerRoots[def.key] = root;
-        resolve({ ok: true, def, root });
-      },
-      onProgress,
-      (error) => {
-        console.error(`Error cargando ${def.url}:`, error);
-        resolve({ ok: false, def, error });
+// Las bandejas de hormigón de Fallingwater no son blancas: Wright las
+// pintó en un ocre crema cálido (a veces descrito como "Cherokee red"
+// solo para metales/acentos; el hormigón en sí es este tono claro),
+// visible en cualquier foto real de la casa. El modelo de SketchUp trae
+// esas caras con material blanco genérico, así que se sobreescribe el
+// color aquí en vez de depender de lo que venga en el .glb. Por pedido
+// del usuario, "muros" adopta el mismo tono que "placas".
+const PLACAS_COLOR = new THREE.Color(0xcdbb92);
+
+function prepMesh(child, tintColor) {
+  child.castShadow = true;
+  child.receiveShadow = true;
+  const mats = Array.isArray(child.material) ? child.material : [child.material];
+  mats.forEach((m, i) => {
+    if (!m) return;
+    if ('roughness' in m) m.envMapIntensity = 1.15;
+    if (tintColor && m.color && !m.map) {
+      // clonar el material antes de teñirlo: si el .glb reutiliza el
+      // mismo material en varias mallas, tocar m.color directamente
+      // afectaría a todas por igual (lo cual, en este caso, es lo que
+      // queremos para toda la capa "placas", pero clonar evita
+      // sorpresas si el motor cachea el material entre capas).
+      // Se excluyen los materiales con textura (m.map): en "muros" hay
+      // piedra con textura real que debe quedar intacta; solo se tiñen
+      // las caras con material blanco genérico sin textura.
+      const tinted = m.clone();
+      tinted.color.copy(tintColor);
+      if (Array.isArray(child.material)) {
+        child.material[i] = tinted;
+      } else {
+        child.material = tinted;
       }
-    );
+    }
   });
 }
 
-// Progreso en bytes agregado de las 8 capas
+// Carga uno o varios .glb (def.url o def.urls) y los agrupa bajo una
+// única raíz de capa. Esto es lo que permite que "placas" (cubierta.glb +
+// pisos.glb) se controle con un solo botón en el panel de capas.
+function loadLayer(def, onProgress) {
+  const urls = def.urls || [def.url];
+  const group = new THREE.Group();
+  group.name = def.key;
+  let anyOk = false;
+  let lastError = null;
+
+  const loads = urls.map(
+    (url) =>
+      new Promise((resolve) => {
+        loader.load(
+          url,
+          (gltf) => {
+            const root = gltf.scene;
+            const tint = def.key === 'placas' || def.key === 'muros' ? PLACAS_COLOR : null;
+            root.traverse((child) => {
+              if (child.isMesh) prepMesh(child, tint);
+            });
+            group.add(root);
+            anyOk = true;
+            resolve();
+          },
+          (evt) => onProgress(url, evt),
+          (error) => {
+            console.error(`Error cargando ${url}:`, error);
+            lastError = error;
+            resolve();
+          }
+        );
+      })
+  );
+
+  return Promise.all(loads).then(() => {
+    if (!anyOk) {
+      return { ok: false, def, error: lastError || new Error(`No se pudo cargar ${urls.join(', ')}`) };
+    }
+    worldRoot.add(group);
+    layerRoots[def.key] = group;
+    return { ok: true, def, root: group };
+  });
+}
+
+// Progreso en bytes agregado de todas las capas (indexado por url, no por
+// capa, ya que "placas" reparte su progreso entre dos archivos).
 const byteProgress = {};
 function updateLoaderPct() {
   let loaded = 0;
@@ -306,25 +364,20 @@ function boxesLookLikeDuplicates(boxA, boxB) {
 }
 
 // Oculta en "Contexto" cualquier malla que sea, en la práctica, la misma
-// pieza que ya existe en "Pisos" o "Pisos 2". Se hace en tiempo real (no
-// por nombre de nodo) porque la geometría de estos .glb viene comprimida
-// con Draco: solo se puede comparar de forma confiable una vez el
-// navegador ya la descomprimió, y así el criterio sigue funcionando aunque
-// cambien los nombres de los nodos en una futura re-exportación.
+// pieza que ya existe en "Placas" (cubierta+pisos). Se hace en tiempo real
+// (no por nombre de nodo) porque la geometría de estos .glb viene
+// comprimida con Draco: solo se puede comparar de forma confiable una vez
+// el navegador ya la descomprimió, y así el criterio sigue funcionando
+// aunque cambien los nombres de los nodos en una futura re-exportación.
 function removeContextoDuplicatesOfPisos() {
   const contextoRoot = layerRoots.contexto;
-  const pisosRoot = layerRoots.pisos;
-  const pisos2Root = layerRoots.pisos2;
-  if (!contextoRoot || (!pisosRoot && !pisos2Root)) return;
+  const placasRoot = layerRoots.placas;
+  if (!contextoRoot || !placasRoot) return;
 
   contextoRoot.updateMatrixWorld(true);
-  if (pisosRoot) pisosRoot.updateMatrixWorld(true);
-  if (pisos2Root) pisos2Root.updateMatrixWorld(true);
+  placasRoot.updateMatrixWorld(true);
 
-  const pisosBoxes = [
-    ...(pisosRoot ? collectMeshes(pisosRoot) : []),
-    ...(pisos2Root ? collectMeshes(pisos2Root) : []),
-  ]
+  const pisosBoxes = collectMeshes(placasRoot)
     .map((mesh) => new THREE.Box3().setFromObject(mesh))
     .filter((box) => !box.isEmpty());
   if (!pisosBoxes.length) return;
@@ -416,9 +469,9 @@ function updateLayerButtonState(key, { unavailable = false, active = null } = {}
 async function init() {
   const results = await Promise.all(
     LAYERS.map((def) =>
-      loadLayer(def, (evt) => {
+      loadLayer(def, (url, evt) => {
         if (!evt.lengthComputable) return;
-        byteProgress[def.key] = { loaded: evt.loaded, total: evt.total };
+        byteProgress[url] = { loaded: evt.loaded, total: evt.total };
         updateLoaderPct();
       })
     )
@@ -443,7 +496,7 @@ async function init() {
   });
 
   if (!hasGeometry) {
-    showFallback(new Error('No se pudo cargar ninguna de las 8 capas (cubierta, muros, carpinterias, pisos, pisos2, contexto, cascada, arboles).'));
+    showFallback(new Error('No se pudo cargar ninguna de las capas (placas, muros, carpinterias, caminos, contexto, cascada, arboles).'));
     return;
   }
 
