@@ -39,7 +39,11 @@ const HOUSE_LAYERS = [
   // "placas" agrupa cubierta.glb + pisos.glb bajo un solo botón: se
   // cargan ambos archivos y sus mallas se unen dentro de una misma capa.
   { key: 'placas', urls: ['cubierta.glb', 'pisos.glb'], label: 'Placas' },
-  { key: 'muros', url: 'muros.glb', label: 'Muros' },
+  // "muros" agrega tapas.glb: dos parches modelados en SketchUp que
+  // cierran los huecos triangulares detectados en la exportación
+  // original de muros.glb (mismo sistema de coordenadas, mismo archivo
+  // fuente). Se cargan juntos bajo el mismo botón "Muros".
+  { key: 'muros', urls: ['muros.glb', 'tapas.glb'], label: 'Muros' },
   { key: 'carpinterias', url: 'carpinterias.glb', label: 'Carpinterías' },
   { key: 'caminos', url: 'caminos.glb', label: 'Caminos' },
 ];
@@ -449,6 +453,47 @@ window.logFwCamera = function () {
   console.log('[Fallingwater] Target:', { x: +t.x.toFixed(3), y: +t.y.toFixed(3), z: +t.z.toFixed(3) });
   console.log('[Fallingwater] Distancia al centro (~viewDist):', +dist.toFixed(3));
 };
+
+// ─── Ayuda de consola para ubicar un punto exacto (p. ej. las esquinas de
+// un hueco a tapar en "muros") ───
+// Clic simple (sin arrastrar, para no chocar con OrbitControls) sobre
+// cualquier capa visible: imprime en consola las coordenadas 3D exactas
+// del punto donde se hizo clic, ya en el sistema recentrado de worldRoot
+// (el mismo que usan frameCameraOnModel/VIEW_DIR). Con 2-3 clics sobre
+// las esquinas del hueco se puede armar un parche con coordenadas reales
+// en vez de adivinarlas.
+const clickRaycaster = new THREE.Raycaster();
+const clickMouse = new THREE.Vector2();
+let pointerDownPos = null;
+
+renderer.domElement.addEventListener('pointerdown', (e) => {
+  pointerDownPos = { x: e.clientX, y: e.clientY };
+});
+
+renderer.domElement.addEventListener('pointerup', (e) => {
+  if (!pointerDownPos) return;
+  const dx = e.clientX - pointerDownPos.x;
+  const dy = e.clientY - pointerDownPos.y;
+  pointerDownPos = null;
+  if (Math.sqrt(dx * dx + dy * dy) > 4) return; // fue un arrastre/órbita, no un clic
+
+  const rect = renderer.domElement.getBoundingClientRect();
+  clickMouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+  clickMouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+  clickRaycaster.setFromCamera(clickMouse, camera);
+  const hits = clickRaycaster.intersectObject(worldRoot, true);
+  if (!hits.length) {
+    console.log('[Fallingwater] Clic sin impacto sobre el modelo.');
+    return;
+  }
+  const p = hits[0].point;
+  console.log('[Fallingwater] Punto clic (coords. del modelo):', {
+    x: +p.x.toFixed(3),
+    y: +p.y.toFixed(3),
+    z: +p.z.toFixed(3),
+  });
+  console.log('[Fallingwater] Malla golpeada:', hits[0].object.name || '(sin nombre)', '· capa:', hits[0].object.parent?.parent?.name || '?');
+});
 
 function updateLayerButtonState(key, { unavailable = false, active = null } = {}) {
   const btn = document.querySelector(`.fw-layer-btn[data-layer="${key}"]`);
